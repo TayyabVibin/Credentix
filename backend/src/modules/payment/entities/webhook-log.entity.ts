@@ -12,10 +12,20 @@ export class WebhookLog {
   id!: string;
 
   @Index()
-  @Column({ type: 'varchar', length: 64, nullable: true, name: 'raw_payload_hash' })
+  @Column({
+    type: 'varchar',
+    length: 64,
+    nullable: true,
+    name: 'raw_payload_hash',
+  })
   rawPayloadHash!: string | null;
 
-  @Column({ type: 'varchar', length: 64, nullable: true, name: 'psp_reference' })
+  @Column({
+    type: 'varchar',
+    length: 64,
+    nullable: true,
+    name: 'psp_reference',
+  })
   pspReference!: string | null;
 
   @Column({ type: 'varchar', length: 64, name: 'event_code' })

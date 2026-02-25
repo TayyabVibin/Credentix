@@ -6,7 +6,12 @@ export class UserResponseDto {
   role!: UserRole;
   createdAt!: Date;
 
-  static fromEntity(user: { id: string; email: string; role: UserRole; createdAt: Date }): UserResponseDto {
+  static fromEntity(user: {
+    id: string;
+    email: string;
+    role: UserRole;
+    createdAt: Date;
+  }): UserResponseDto {
     const dto = new UserResponseDto();
     dto.id = user.id;
     dto.email = user.email;

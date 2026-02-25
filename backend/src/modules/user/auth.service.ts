@@ -19,7 +19,9 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(dto: RegisterDto): Promise<{ user: UserResponseDto; accessToken: string }> {
+  async register(
+    dto: RegisterDto,
+  ): Promise<{ user: UserResponseDto; accessToken: string }> {
     const existing = await this.userService.findByEmail(dto.email);
     if (existing) {
       throw new ConflictException('Email already registered');
@@ -35,7 +37,9 @@ export class AuthService {
     return { user: UserResponseDto.fromEntity(user), accessToken };
   }
 
-  async login(dto: LoginDto): Promise<{ user: UserResponseDto; accessToken: string }> {
+  async login(
+    dto: LoginDto,
+  ): Promise<{ user: UserResponseDto; accessToken: string }> {
     const user = await this.userService.findByEmail(dto.email);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
