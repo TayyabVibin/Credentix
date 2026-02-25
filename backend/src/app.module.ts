@@ -2,7 +2,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { WinstonModule } from 'nest-winston';
 import { AppController } from './app.controller';
+import { winstonConfig } from './common/logger/winston.config';
 import { UserModule } from './modules/user/user.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { WalletModule } from './modules/wallet/wallet.module';
@@ -19,6 +21,7 @@ import { LedgerEntry } from './modules/wallet/entities/ledger-entry.entity';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    WinstonModule.forRoot(winstonConfig),
     EventEmitterModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

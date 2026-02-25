@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, lazy, Suspense } from 'react';
+import { useSnackbar } from 'notistack';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -11,6 +12,7 @@ import ProtectedRoute from './components/ProtectedRoute.tsx';
 import AdminRoute from './components/AdminRoute.tsx';
 import { useAppDispatch, useAppSelector } from './store/hooks.ts';
 import { fetchProfile } from './store/authSlice.ts';
+import { API_ERROR_EVENT } from './utils/apiErrorEvent.ts';
 
 const LoginPage = lazy(() => import('./pages/LoginPage.tsx'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage.tsx'));
@@ -50,12 +52,21 @@ export default function App() {
 
   const dispatch = useAppDispatch();
   const { isAuthenticated, user } = useAppSelector((s) => s.auth);
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     if (isAuthenticated && !user) {
       dispatch(fetchProfile());
     }
   }, [isAuthenticated, user, dispatch]);
+
+  useEffect(() => {
+    const handler = (e: CustomEvent<{ message: string }>) => {
+      enqueueSnackbar(e.detail.message, { variant: 'error' });
+    };
+    window.addEventListener(API_ERROR_EVENT, handler as EventListener);
+    return () => window.removeEventListener(API_ERROR_EVENT, handler as EventListener);
+  }, [enqueueSnackbar]);
 
   return (
     <ThemeProvider theme={theme}>
