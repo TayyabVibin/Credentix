@@ -1,35 +1,80 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useMemo, useEffect, lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+import { lightTheme, darkTheme } from './theme.ts';
+import Layout from './components/Layout.tsx';
+import ProtectedRoute from './components/ProtectedRoute.tsx';
+import { useAppDispatch, useAppSelector } from './store/hooks.ts';
+import { fetchProfile } from './store/authSlice.ts';
 
-function App() {
-  const [count, setCount] = useState(0)
+const LoginPage = lazy(() => import('./pages/LoginPage.tsx'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage.tsx'));
+const WalletPage = lazy(() => import('./pages/WalletPage.tsx'));
+const PurchasePage = lazy(() => import('./pages/PurchasePage.tsx'));
+const PurchaseProcessingPage = lazy(() => import('./pages/PurchaseProcessingPage.tsx'));
+const TransactionsPage = lazy(() => import('./pages/TransactionsPage.tsx'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage.tsx'));
 
+function LoadingFallback() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+      <CircularProgress />
+    </Box>
+  );
 }
 
-export default App
+export default function App() {
+  const [mode, setMode] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('credentix_theme');
+    return (saved === 'dark' ? 'dark' : 'light');
+  });
+
+  const theme = useMemo(() => (mode === 'dark' ? darkTheme : lightTheme), [mode]);
+
+  const toggleTheme = () => {
+    setMode((prev) => {
+      const next = prev === 'light' ? 'dark' : 'light';
+      localStorage.setItem('credentix_theme', next);
+      return next;
+    });
+  };
+
+  const dispatch = useAppDispatch();
+  const { isAuthenticated, user } = useAppSelector((s) => s.auth);
+
+  useEffect(() => {
+    if (isAuthenticated && !user) {
+      dispatch(fetchProfile());
+    }
+  }, [isAuthenticated, user, dispatch]);
+
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <BrowserRouter>
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+
+            <Route element={<ProtectedRoute />}>
+              <Route element={<Layout themeMode={mode} onThemeToggle={toggleTheme} />}>
+                <Route path="/wallet" element={<WalletPage />} />
+                <Route path="/purchase" element={<PurchasePage />} />
+                <Route path="/purchase/processing" element={<PurchaseProcessingPage />} />
+                <Route path="/purchase/return" element={<PurchaseProcessingPage />} />
+                <Route path="/transactions" element={<TransactionsPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+              </Route>
+            </Route>
+
+            <Route path="*" element={<Navigate to={isAuthenticated ? '/wallet' : '/login'} replace />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </ThemeProvider>
+  );
+}
