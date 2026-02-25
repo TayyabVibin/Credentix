@@ -6,7 +6,9 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { lightTheme, darkTheme } from './theme.ts';
 import Layout from './components/Layout.tsx';
+import AdminLayout from './components/AdminLayout.tsx';
 import ProtectedRoute from './components/ProtectedRoute.tsx';
+import AdminRoute from './components/AdminRoute.tsx';
 import { useAppDispatch, useAppSelector } from './store/hooks.ts';
 import { fetchProfile } from './store/authSlice.ts';
 
@@ -17,6 +19,10 @@ const PurchasePage = lazy(() => import('./pages/PurchasePage.tsx'));
 const PurchaseProcessingPage = lazy(() => import('./pages/PurchaseProcessingPage.tsx'));
 const TransactionsPage = lazy(() => import('./pages/TransactionsPage.tsx'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage.tsx'));
+const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage.tsx'));
+const AdminPaymentsPage = lazy(() => import('./pages/admin/AdminPaymentsPage.tsx'));
+const AdminPaymentDetailPage = lazy(() => import('./pages/admin/AdminPaymentDetailPage.tsx'));
+const AdminWebhooksPage = lazy(() => import('./pages/admin/AdminWebhooksPage.tsx'));
 
 function LoadingFallback() {
   return (
@@ -68,6 +74,15 @@ export default function App() {
                 <Route path="/purchase/return" element={<PurchaseProcessingPage />} />
                 <Route path="/transactions" element={<TransactionsPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+              </Route>
+
+              <Route element={<AdminRoute />}>
+                <Route element={<AdminLayout themeMode={mode} onThemeToggle={toggleTheme} />}>
+                  <Route path="/admin" element={<AdminDashboardPage />} />
+                  <Route path="/admin/payments" element={<AdminPaymentsPage />} />
+                  <Route path="/admin/payments/:id" element={<AdminPaymentDetailPage />} />
+                  <Route path="/admin/webhooks" element={<AdminWebhooksPage />} />
+                </Route>
               </Route>
             </Route>
 
