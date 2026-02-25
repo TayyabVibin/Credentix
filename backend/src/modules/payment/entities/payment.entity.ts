@@ -26,10 +26,21 @@ export class Payment {
   @JoinColumn({ name: 'user_id' })
   user!: User;
 
-  @Column({ type: 'varchar', length: 64, unique: true, name: 'merchant_reference' })
+  @Column({
+    type: 'varchar',
+    length: 64,
+    unique: true,
+    name: 'merchant_reference',
+  })
   merchantReference!: string;
 
-  @Column({ type: 'varchar', length: 64, unique: true, nullable: true, name: 'psp_reference' })
+  @Column({
+    type: 'varchar',
+    length: 64,
+    unique: true,
+    nullable: true,
+    name: 'psp_reference',
+  })
   pspReference!: string | null;
 
   @Column({ type: 'int', name: 'amount_minor' })
@@ -39,13 +50,27 @@ export class Payment {
   currency!: string;
 
   @Index()
-  @Column({ type: 'enum', enum: PaymentStatus, default: PaymentStatus.INITIATED })
+  @Column({
+    type: 'enum',
+    enum: PaymentStatus,
+    default: PaymentStatus.INITIATED,
+  })
   status!: PaymentStatus;
 
-  @Column({ type: 'varchar', length: 32, nullable: true, name: 'payment_method_type' })
+  @Column({
+    type: 'varchar',
+    length: 32,
+    nullable: true,
+    name: 'payment_method_type',
+  })
   paymentMethodType!: string | null;
 
-  @Column({ type: 'varchar', length: 64, unique: true, name: 'idempotency_key' })
+  @Column({
+    type: 'varchar',
+    length: 64,
+    unique: true,
+    name: 'idempotency_key',
+  })
   idempotencyKey!: string;
 
   @Column({ type: 'text', nullable: true, name: 'failure_reason' })
