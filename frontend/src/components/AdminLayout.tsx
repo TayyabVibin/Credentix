@@ -15,22 +15,19 @@ import ListItemText from '@mui/material/ListItemText';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import MenuRounded from '@mui/icons-material/MenuRounded';
-import AccountBalanceWalletRounded from '@mui/icons-material/AccountBalanceWalletRounded';
-import ShoppingCartRounded from '@mui/icons-material/ShoppingCartRounded';
-import ReceiptLongRounded from '@mui/icons-material/ReceiptLongRounded';
-import PersonRounded from '@mui/icons-material/PersonRounded';
+import DashboardRounded from '@mui/icons-material/DashboardRounded';
+import PaymentRounded from '@mui/icons-material/PaymentRounded';
+import WebhookRounded from '@mui/icons-material/WebhookRounded';
+import HomeRounded from '@mui/icons-material/HomeRounded';
 import LogoutRounded from '@mui/icons-material/LogoutRounded';
-import AdminPanelSettingsRounded from '@mui/icons-material/AdminPanelSettingsRounded';
 import ThemeToggle from './ThemeToggle.tsx';
 import { useAppDispatch, useAppSelector } from '../store/hooks.ts';
 import { logout } from '../store/authSlice.ts';
 
-const NAV_ITEMS = [
-  { label: 'Wallet', path: '/wallet', icon: <AccountBalanceWalletRounded /> },
-  { label: 'Purchase', path: '/purchase', icon: <ShoppingCartRounded /> },
-  { label: 'Transactions', path: '/transactions', icon: <ReceiptLongRounded /> },
-  { label: 'Profile', path: '/profile', icon: <PersonRounded /> },
-  { label: 'Admin', path: '/admin', icon: <AdminPanelSettingsRounded />, adminOnly: true },
+const ADMIN_NAV = [
+  { label: 'Dashboard', path: '/admin', icon: <DashboardRounded /> },
+  { label: 'Payments', path: '/admin/payments', icon: <PaymentRounded /> },
+  { label: 'Webhooks', path: '/admin/webhooks', icon: <WebhookRounded /> },
 ];
 
 interface Props {
@@ -38,7 +35,7 @@ interface Props {
   onThemeToggle: () => void;
 }
 
-export default function Layout({ themeMode, onThemeToggle }: Props) {
+export default function AdminLayout({ themeMode, onThemeToggle }: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,21 +49,26 @@ export default function Layout({ themeMode, onThemeToggle }: Props) {
     navigate('/login');
   };
 
+  const isActive = (path: string) => {
+    if (path === '/admin') return location.pathname === '/admin';
+    return location.pathname.startsWith(path);
+  };
+
   const drawerContent = (
     <Box sx={{ width: 260, pt: 2 }}>
       <Box sx={{ px: 3, pb: 2, borderBottom: 1, borderColor: 'divider' }}>
         <Typography variant="h6" fontWeight={700} color="primary">
-          Credentix
+          Admin
         </Typography>
         <Typography variant="caption" color="text.secondary">
           {user?.email}
         </Typography>
       </Box>
       <List sx={{ px: 1, pt: 1 }}>
-        {NAV_ITEMS.filter((item) => !('adminOnly' in item && item.adminOnly) || user?.role === 'ADMIN').map((item) => (
+        {ADMIN_NAV.map((item) => (
           <ListItemButton
             key={item.path}
-            selected={location.pathname === item.path}
+            selected={isActive(item.path)}
             onClick={() => {
               navigate(item.path);
               setDrawerOpen(false);
@@ -77,7 +79,16 @@ export default function Layout({ themeMode, onThemeToggle }: Props) {
             <ListItemText primary={item.label} />
           </ListItemButton>
         ))}
-        <ListItemButton onClick={handleLogout} sx={{ borderRadius: 2, mt: 2, color: 'error.main' }}>
+        <ListItemButton
+          onClick={() => { navigate('/wallet'); setDrawerOpen(false); }}
+          sx={{ borderRadius: 2, mt: 2 }}
+        >
+          <ListItemIcon sx={{ minWidth: 40 }}>
+            <HomeRounded />
+          </ListItemIcon>
+          <ListItemText primary="Back to App" />
+        </ListItemButton>
+        <ListItemButton onClick={handleLogout} sx={{ borderRadius: 2, mt: 0.5, color: 'error.main' }}>
           <ListItemIcon sx={{ minWidth: 40, color: 'inherit' }}>
             <LogoutRounded />
           </ListItemIcon>
@@ -109,27 +120,34 @@ export default function Layout({ themeMode, onThemeToggle }: Props) {
             variant="h6"
             fontWeight={800}
             sx={{ cursor: 'pointer', color: 'primary.main' }}
-            onClick={() => navigate('/wallet')}
+            onClick={() => navigate('/admin')}
           >
-            Credentix
+            Credentix Admin
           </Typography>
           <Box sx={{ flex: 1 }} />
 
           {!isMobile && (
             <Box sx={{ display: 'flex', gap: 0.5 }}>
-              {NAV_ITEMS.filter((item) => !('adminOnly' in item && item.adminOnly) || user?.role === 'ADMIN').map((item) => (
+              {ADMIN_NAV.map((item) => (
                 <Button
                   key={item.path}
-                  color={location.pathname === item.path ? 'primary' : 'inherit'}
+                  color={isActive(item.path) ? 'primary' : 'inherit'}
                   onClick={() => navigate(item.path)}
                   sx={{
-                    fontWeight: location.pathname === item.path ? 700 : 500,
+                    fontWeight: isActive(item.path) ? 700 : 500,
                     borderRadius: 2,
                   }}
                 >
                   {item.label}
                 </Button>
               ))}
+              <Button
+                onClick={() => navigate('/wallet')}
+                sx={{ ml: 1, borderRadius: 2 }}
+                startIcon={<HomeRounded />}
+              >
+                App
+              </Button>
             </Box>
           )}
 
@@ -147,7 +165,7 @@ export default function Layout({ themeMode, onThemeToggle }: Props) {
         {drawerContent}
       </Drawer>
 
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Container maxWidth="xl" sx={{ py: 4 }}>
         <Outlet />
       </Container>
     </Box>
