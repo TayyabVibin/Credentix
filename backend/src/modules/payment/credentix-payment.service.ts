@@ -1,5 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { Payment } from './entities/payment.entity';
@@ -7,6 +8,7 @@ import { PaymentEvent } from './entities/payment-event.entity';
 import { PaymentStatus } from '../../common/enums/payment-status.enum';
 import { PaymentStateMachine } from './payment-state-machine';
 import { AdyenService } from './adyen.service';
+import { PaymentCapturedEvent } from '../../common/events/payment-captured.event';
 import { CREDIT_BUNDLES, BundleId } from '../../../config/constants';
 
 @Injectable()
@@ -19,6 +21,7 @@ export class CredentixPaymentService {
     @InjectRepository(PaymentEvent)
     private readonly paymentEventRepo: Repository<PaymentEvent>,
     private readonly adyenService: AdyenService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async initiatePayment(userId: string, bundleId: BundleId, returnUrl: string) {
@@ -96,6 +99,13 @@ export class CredentixPaymentService {
     this.logger.log(
       `Payment ${payment.id}: ${fromStatus} → ${newStatus} [${source}]`,
     );
+
+    if (newStatus === PaymentStatus.CAPTURED) {
+      this.eventEmitter.emit(
+        PaymentCapturedEvent.EVENT_NAME,
+        new PaymentCapturedEvent(updated),
+      );
+    }
 
     return updated;
   }

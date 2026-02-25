@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AppController } from './app.controller';
 import { UserModule } from './modules/user/user.module';
 import { PaymentModule } from './modules/payment/payment.module';
@@ -18,6 +19,7 @@ import { LedgerEntry } from './modules/wallet/entities/ledger-entry.entity';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    EventEmitterModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
