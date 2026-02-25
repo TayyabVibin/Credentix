@@ -11,13 +11,17 @@ import PaymentRounded from '@mui/icons-material/PaymentRounded';
 import BundleSelector from '../components/BundleSelector.tsx';
 import PageTransition from '../components/PageTransition.tsx';
 import { useAppDispatch, useAppSelector } from '../store/hooks.ts';
-import { initiatePurchase } from '../store/paymentsSlice.ts';
+import { initiatePurchase, clearPurchase } from '../store/paymentsSlice.ts';
 
 export default function PurchasePage() {
   const [selected, setSelected] = useState<string | null>(null);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { loading, error } = useAppSelector((s) => s.payments);
+
+  const handleRetry = () => {
+    dispatch(clearPurchase());
+  };
 
   const handlePurchase = async () => {
     if (!selected) return;
@@ -41,7 +45,15 @@ export default function PurchasePage() {
         </Typography>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
+          <Alert
+            severity="error"
+            sx={{ mb: 3 }}
+            action={
+              <Button color="inherit" size="small" onClick={handleRetry}>
+                Retry
+              </Button>
+            }
+          >
             {error}
           </Alert>
         )}

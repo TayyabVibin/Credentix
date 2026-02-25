@@ -12,6 +12,7 @@ export default defineConfig({
       '/webhooks': 'http://localhost:3000',
       '/admin': 'http://localhost:3000',
       '/health': 'http://localhost:3000',
+      '/api': 'http://localhost:3000',
     },
   },
 })
