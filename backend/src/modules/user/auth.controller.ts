@@ -59,7 +59,8 @@ export class AuthController {
     if (dto.useCase !== undefined) updateData.useCase = dto.useCase;
     if (dto.avatarUrl !== undefined) updateData.avatarUrl = dto.avatarUrl;
     if (dto.country !== undefined) updateData.country = dto.country;
-    if (dto.businessType !== undefined) updateData.businessType = dto.businessType;
+    if (dto.businessType !== undefined)
+      updateData.businessType = dto.businessType;
 
     const user = await this.userService.update(req.user.id, updateData);
     return UserResponseDto.fromEntity(user);

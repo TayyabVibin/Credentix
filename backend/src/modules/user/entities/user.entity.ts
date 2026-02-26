@@ -4,7 +4,6 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
 } from 'typeorm';
 import { UserRole } from '../../../common/enums/user-role.enum';
 
@@ -40,7 +39,12 @@ export class User {
   @Column({ type: 'varchar', length: 100, nullable: true })
   country!: string | null;
 
-  @Column({ type: 'varchar', length: 100, name: 'business_type', nullable: true })
+  @Column({
+    type: 'varchar',
+    length: 100,
+    name: 'business_type',
+    nullable: true,
+  })
   businessType!: string | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
