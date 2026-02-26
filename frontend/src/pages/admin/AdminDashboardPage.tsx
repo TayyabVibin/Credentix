@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Skeleton from '@mui/material/Skeleton';
+import { useTheme } from '@mui/material/styles';
 import TrendingUpRounded from '@mui/icons-material/TrendingUpRounded';
 import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
 import ScheduleRounded from '@mui/icons-material/ScheduleRounded';
@@ -65,6 +66,7 @@ function MetricCard({
 
 export default function AdminDashboardPage() {
   const dispatch = useAppDispatch();
+  const theme = useTheme();
   const { metrics, loading } = useAppSelector((s) => s.admin);
 
   useEffect(() => {
@@ -135,6 +137,7 @@ export default function AdminDashboardPage() {
                   gap: 1,
                   alignItems: 'flex-end',
                   height: 120,
+                  minHeight: 120,
                 }}
               >
                 {metrics.dailyVolume.map((d, i) => {
@@ -142,18 +145,21 @@ export default function AdminDashboardPage() {
                     ...metrics.dailyVolume.map((x) => x.amountMinor),
                     1,
                   );
-                  const h = (d.amountMinor / max) * 100;
+                  const barHeightPx = Math.max(
+                    4,
+                    (d.amountMinor / max) * 120,
+                  );
                   return (
                     <motion.div
                       key={d.date}
                       initial={{ height: 0 }}
-                      animate={{ height: `${h}%` }}
+                      animate={{ height: barHeightPx }}
                       transition={{ delay: i * 0.05, duration: 0.4 }}
                       style={{
                         flex: 1,
-                        minHeight: 4,
+                        minWidth: 0,
                         borderRadius: 8,
-                        backgroundColor: 'var(--mui-palette-primary-main)',
+                        backgroundColor: theme.palette.primary.main,
                       }}
                       title={`${d.date}: ${formatVolume(d.amountMinor)}`}
                     />

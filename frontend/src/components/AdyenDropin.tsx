@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react';
 import { AdyenCheckout, Dropin } from '@adyen/adyen-web/auto';
 import '@adyen/adyen-web/styles/adyen.css';
 import Box from '@mui/material/Box';
-import CircularProgress from '@mui/material/CircularProgress';
 
 interface Props {
   sessionId: string;
@@ -71,32 +70,7 @@ export default function AdyenDropin({
 
   return (
     <Box sx={{ minHeight: 200, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <Box
-        ref={containerRef}
-        sx={{
-          width: '100%',
-          '& .adyen-checkout__dropin': { maxWidth: '100%' },
-          '& .adyen-checkout__payment-method': {
-            borderRadius: '12px !important',
-            border: '1px solid rgba(255,255,255,0.1) !important',
-            bgcolor: 'transparent',
-          },
-          '& .adyen-checkout__button--pay': {
-            borderRadius: '12px !important',
-            fontWeight: 600,
-          },
-        }}
-      />
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          py: 4,
-          '&:has(+ .adyen-checkout__dropin)': { display: 'none' },
-        }}
-      >
-        <CircularProgress size={40} />
-      </Box>
+      <Box ref={containerRef} sx={{ width: '100%' }} />
     </Box>
   );
 }

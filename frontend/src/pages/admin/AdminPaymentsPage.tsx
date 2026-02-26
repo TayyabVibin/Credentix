@@ -19,6 +19,7 @@ import Skeleton from '@mui/material/Skeleton';
 import IconButton from '@mui/material/IconButton';
 import SearchRounded from '@mui/icons-material/SearchRounded';
 import VisibilityRounded from '@mui/icons-material/VisibilityRounded';
+import Alert from '@mui/material/Alert';
 import StatusBadge from '../../components/StatusBadge.tsx';
 import PageTransition from '../../components/PageTransition.tsx';
 import { useAppDispatch, useAppSelector } from '../../store/hooks.ts';
@@ -48,6 +49,7 @@ export default function AdminPaymentsPage() {
     paymentsPage,
     paymentsPages,
     loading,
+    error,
   } = useAppSelector((s) => s.admin);
 
   useEffect(() => {
@@ -75,6 +77,12 @@ export default function AdminPaymentsPage() {
         <Typography variant="h4" sx={{ mb: 3 }}>
           Payments
         </Typography>
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
 
         <Box
           sx={{

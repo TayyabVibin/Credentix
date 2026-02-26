@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -39,6 +39,28 @@ export default function PurchaseProcessingPage() {
     },
     [dispatch],
   );
+
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  useEffect(() => {
+    if (status !== 'success') return;
+    let elapsed = 0;
+    const POLL_MS = 2500;
+    const MAX_POLL_MS = 15000;
+    pollIntervalRef.current = setInterval(() => {
+      elapsed += POLL_MS;
+      dispatch(fetchWallet());
+      if (elapsed >= MAX_POLL_MS && pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
+    }, POLL_MS);
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
+    };
+  }, [status, dispatch]);
 
   const handleError = useCallback((error: unknown) => {
     const msg =
@@ -166,20 +188,32 @@ export default function PurchaseProcessingPage() {
                   <Typography variant="h5" fontWeight={700} gutterBottom color="success.main">
                     Payment Successful!
                   </Typography>
-                  <Typography color="text.secondary" sx={{ mb: 4 }}>
+                  <Typography color="text.secondary" sx={{ mb: 2 }}>
                     Credits have been added to your wallet.
                   </Typography>
-                  <Button
-                    variant="contained"
-                    size="large"
-                    onClick={() => {
-                      dispatch(clearPurchase());
-                      navigate('/wallet');
-                    }}
-                    sx={{ px: 5, py: 1.5 }}
-                  >
-                    Go to Wallet
-                  </Button>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                    If your balance has not updated yet, we are still processing. Click Refresh or wait a moment.
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <Button
+                      variant="outlined"
+                      size="large"
+                      onClick={() => dispatch(fetchWallet())}
+                    >
+                      Refresh Balance
+                    </Button>
+                    <Button
+                      variant="contained"
+                      size="large"
+                      onClick={() => {
+                        dispatch(clearPurchase());
+                        navigate('/wallet');
+                      }}
+                      sx={{ px: 5, py: 1.5 }}
+                    >
+                      Go to Wallet
+                    </Button>
+                  </Box>
                 </motion.div>
               )}
 

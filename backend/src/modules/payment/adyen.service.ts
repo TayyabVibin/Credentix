@@ -61,6 +61,7 @@ export class AdyenService {
       returnUrl: params.returnUrl,
       channel: CreateCheckoutSessionRequest.ChannelEnum.Web,
       countryCode: 'US',
+      captureDelayHours: this.config.get<number>('CAPTURE_DELAY_HOURS', 0),
     });
 
     return {
