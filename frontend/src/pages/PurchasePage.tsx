@@ -7,11 +7,24 @@ import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import Grid from '@mui/material/Grid';
 import PaymentRounded from '@mui/icons-material/PaymentRounded';
+import SecurityRounded from '@mui/icons-material/SecurityRounded';
+import SpeedRounded from '@mui/icons-material/SpeedRounded';
+import VerifiedUserRounded from '@mui/icons-material/VerifiedUserRounded';
+import Lottie from 'lottie-react';
+import { motion } from 'framer-motion';
 import BundleSelector from '../components/BundleSelector.tsx';
 import PageTransition from '../components/PageTransition.tsx';
 import { useAppDispatch, useAppSelector } from '../store/hooks.ts';
 import { initiatePurchase, clearPurchase } from '../store/paymentsSlice.ts';
+import coinAnim from '../assets/animations/Turning Coin.json';
+
+const trustPoints = [
+  { icon: <SecurityRounded />, label: 'PCI DSS Compliant' },
+  { icon: <SpeedRounded />, label: 'Instant Delivery' },
+  { icon: <VerifiedUserRounded />, label: 'Secure Checkout' },
+];
 
 export default function PurchasePage() {
   const [selected, setSelected] = useState<string | null>(null);
@@ -37,12 +50,28 @@ export default function PurchasePage() {
   return (
     <PageTransition>
       <Box>
-        <Typography variant="h4" sx={{ mb: 1 }}>
-          Purchase Credits
-        </Typography>
-        <Typography color="text.secondary" sx={{ mb: 4 }}>
-          Select a credit bundle to add to your wallet
-        </Typography>
+        <Box sx={{ textAlign: 'center', mb: 6 }}>
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+            <Box sx={{ maxWidth: 100, mx: 'auto', mb: 2 }}>
+              <Lottie animationData={coinAnim} loop />
+            </Box>
+            <Typography
+              variant="h3"
+              sx={{
+                fontWeight: 800,
+                mb: 1,
+                background: 'linear-gradient(135deg, #F1F5F9 0%, #818CF8 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              Purchase Credits
+            </Typography>
+            <Typography color="text.secondary" variant="h6" sx={{ fontWeight: 400, maxWidth: 480, mx: 'auto' }}>
+              Choose the plan that fits your needs. Credits never expire and can be used across all platform features.
+            </Typography>
+          </motion.div>
+        </Box>
 
         {error && (
           <Alert
@@ -60,28 +89,50 @@ export default function PurchasePage() {
 
         <BundleSelector selected={selected} onSelect={setSelected} />
 
-        <Card sx={{ mt: 4 }}>
-          <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
-            <Box>
-              <Typography variant="body2" color="text.secondary">
-                {selected ? 'Ready to purchase' : 'Select a bundle above'}
-              </Typography>
-              {selected && (
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                  You will be redirected to the secure payment page
-                </Typography>
-              )}
-            </Box>
-            <Button
-              variant="contained"
-              size="large"
-              disabled={!selected || loading}
-              onClick={handlePurchase}
-              startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <PaymentRounded />}
-              sx={{ minWidth: 180 }}
-            >
-              {loading ? 'Processing...' : 'Pay Now'}
-            </Button>
+        <Card
+          sx={{
+            mt: 5,
+            backdropFilter: 'blur(16px)',
+            bgcolor: 'rgba(30,41,59,0.55)',
+            border: '1px solid rgba(255,255,255,0.08)',
+          }}
+        >
+          <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+            <Grid container spacing={3} alignItems="center">
+              <Grid size={{ xs: 12, md: 7 }}>
+                <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', mb: { xs: 2, md: 0 } }}>
+                  {trustPoints.map((t) => (
+                    <Box key={t.label} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box sx={{ color: '#818CF8' }}>{t.icon}</Box>
+                      <Typography variant="body2" sx={{ color: '#94A3B8', fontWeight: 500 }}>
+                        {t.label}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </Grid>
+              <Grid size={{ xs: 12, md: 5 }} sx={{ display: 'flex', justifyContent: { md: 'flex-end' } }}>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    variant="contained"
+                    size="large"
+                    disabled={!selected || loading}
+                    onClick={handlePurchase}
+                    startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <PaymentRounded />}
+                    sx={{
+                      minWidth: 200,
+                      py: 1.5,
+                      px: 4,
+                      fontSize: '1rem',
+                      background: selected ? 'linear-gradient(135deg, #6366F1, #818CF8)' : undefined,
+                      '&:hover': selected ? { background: 'linear-gradient(135deg, #4F46E5, #6366F1)' } : undefined,
+                    }}
+                  >
+                    {loading ? 'Processing...' : 'Pay Now'}
+                  </Button>
+                </motion.div>
+              </Grid>
+            </Grid>
           </CardContent>
         </Card>
       </Box>

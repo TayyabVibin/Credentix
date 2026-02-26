@@ -1,7 +1,10 @@
 import { useEffect } from 'react';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
 import Pagination from '@mui/material/Pagination';
+import { motion } from 'framer-motion';
 import TransactionList from '../components/TransactionList.tsx';
 import PageTransition from '../components/PageTransition.tsx';
 import { useAppDispatch, useAppSelector } from '../store/hooks.ts';
@@ -22,11 +25,31 @@ export default function TransactionsPage() {
   return (
     <PageTransition>
       <Box>
-        <Typography variant="h4" sx={{ mb: 3 }}>
-          Transaction History
-        </Typography>
+        <Box sx={{ mb: 4 }}>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 800,
+              background: 'linear-gradient(135deg, #F1F5F9, #818CF8)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              mb: 0.5,
+            }}
+          >
+            Transaction History
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Complete record of all credit transactions in your account
+          </Typography>
+        </Box>
 
-        <TransactionList entries={transactions} loading={loading} />
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <Card>
+            <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+              <TransactionList entries={transactions} loading={loading} />
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {totalPages > 1 && (
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>

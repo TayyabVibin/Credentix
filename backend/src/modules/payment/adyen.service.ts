@@ -60,6 +60,7 @@ export class AdyenService {
       shopperReference: params.shopperReference,
       returnUrl: params.returnUrl,
       channel: CreateCheckoutSessionRequest.ChannelEnum.Web,
+      countryCode: 'US',
     });
 
     return {

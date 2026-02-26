@@ -104,7 +104,8 @@ export default function AdminLayout({ themeMode, onThemeToggle }: Props) {
         position="sticky"
         elevation={0}
         sx={{
-          bgcolor: 'background.paper',
+          bgcolor: 'rgba(11,15,26,0.8)',
+          backdropFilter: 'blur(20px)',
           borderBottom: 1,
           borderColor: 'divider',
           color: 'text.primary',

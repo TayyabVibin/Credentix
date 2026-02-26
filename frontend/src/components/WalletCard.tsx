@@ -1,13 +1,10 @@
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import AccountBalanceWalletRounded from '@mui/icons-material/AccountBalanceWalletRounded';
-import ShoppingCartRounded from '@mui/icons-material/ShoppingCartRounded';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 
 interface Props {
   balance: number;
@@ -15,78 +12,94 @@ interface Props {
 }
 
 export default function WalletCard({ balance, loading }: Props) {
-  const navigate = useNavigate();
-
   return (
-    <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
+    <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.25 }}>
       <Card
         sx={{
-          background: (t) =>
-            `linear-gradient(135deg, ${t.palette.primary.main} 0%, ${t.palette.secondary.main} 100%)`,
+          background: 'linear-gradient(135deg, #1E1B4B 0%, #312E81 30%, #3730A3 60%, #1E3A5F 100%)',
           color: 'white',
           position: 'relative',
           overflow: 'hidden',
+          border: '1px solid rgba(129,140,248,0.2)',
         }}
       >
-        <CardContent sx={{ p: 4 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-            <AccountBalanceWalletRounded sx={{ fontSize: 32, opacity: 0.9 }} />
-            <Typography variant="h6" sx={{ opacity: 0.9 }}>
-              Your Balance
-            </Typography>
+        <CardContent sx={{ p: 4, position: 'relative', zIndex: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+            <Box
+              sx={{
+                width: 44,
+                height: 44,
+                borderRadius: 2.5,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor: 'rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(10px)',
+              }}
+            >
+              <AccountBalanceWalletRounded sx={{ fontSize: 24 }} />
+            </Box>
+            <Box>
+              <Typography variant="body2" sx={{ opacity: 0.7, fontWeight: 500 }}>
+                Available Balance
+              </Typography>
+            </Box>
           </Box>
 
           {loading ? (
-            <Skeleton variant="text" width={180} height={64} sx={{ bgcolor: 'rgba(255,255,255,0.2)' }} />
+            <Skeleton variant="text" width={180} height={64} sx={{ bgcolor: 'rgba(255,255,255,0.15)' }} />
           ) : (
-            <Typography
-              variant="h3"
-              component={motion.div}
-              key={balance}
-              initial={{ scale: 1.1 }}
-              animate={{ scale: 1 }}
-              sx={{ fontWeight: 800, mb: 3 }}
-            >
-              {balance.toLocaleString()} <Typography component="span" variant="h5" sx={{ opacity: 0.8 }}>credits</Typography>
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+              <Typography
+                variant="h2"
+                component={motion.div}
+                key={balance}
+                initial={{ scale: 1.05, opacity: 0.8 }}
+                animate={{ scale: 1, opacity: 1 }}
+                sx={{ fontWeight: 900, lineHeight: 1 }}
+              >
+                {balance.toLocaleString()}
+              </Typography>
+              <Typography variant="h6" sx={{ opacity: 0.6, fontWeight: 500 }}>
+                credits
+              </Typography>
+            </Box>
           )}
-
-          <Button
-            variant="contained"
-            size="large"
-            startIcon={<ShoppingCartRounded />}
-            onClick={() => navigate('/purchase')}
-            sx={{
-              bgcolor: 'rgba(255,255,255,0.2)',
-              color: 'white',
-              backdropFilter: 'blur(10px)',
-              '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' },
-            }}
-          >
-            Purchase Credits
-          </Button>
         </CardContent>
 
+        {/* Decorative elements */}
         <Box
           sx={{
             position: 'absolute',
-            top: -40,
-            right: -40,
-            width: 160,
-            height: 160,
+            top: -60,
+            right: -60,
+            width: 200,
+            height: 200,
             borderRadius: '50%',
-            bgcolor: 'rgba(255,255,255,0.06)',
+            background: 'radial-gradient(circle, rgba(129,140,248,0.15) 0%, transparent 70%)',
           }}
         />
         <Box
           sx={{
             position: 'absolute',
-            bottom: -60,
-            right: 40,
-            width: 200,
-            height: 200,
+            bottom: -40,
+            left: -40,
+            width: 160,
+            height: 160,
             borderRadius: '50%',
-            bgcolor: 'rgba(255,255,255,0.04)',
+            background: 'radial-gradient(circle, rgba(56,189,248,0.1) 0%, transparent 70%)',
+          }}
+        />
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            right: 40,
+            transform: 'translateY(-50%)',
+            width: 120,
+            height: 120,
+            borderRadius: '50%',
+            border: '1px solid rgba(255,255,255,0.05)',
           }}
         />
       </Card>

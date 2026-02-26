@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from './store/hooks.ts';
 import { fetchProfile } from './store/authSlice.ts';
 import { API_ERROR_EVENT } from './utils/apiErrorEvent.ts';
 
+const HomePage = lazy(() => import('./pages/HomePage.tsx'));
 const LoginPage = lazy(() => import('./pages/LoginPage.tsx'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage.tsx'));
 const WalletPage = lazy(() => import('./pages/WalletPage.tsx'));
@@ -37,7 +38,7 @@ function LoadingFallback() {
 export default function App() {
   const [mode, setMode] = useState<'light' | 'dark'>(() => {
     const saved = localStorage.getItem('credentix_theme');
-    return (saved === 'dark' ? 'dark' : 'light');
+    return (saved === 'light' ? 'light' : 'dark');
   });
 
   const theme = useMemo(() => (mode === 'dark' ? darkTheme : lightTheme), [mode]);
@@ -74,6 +75,7 @@ export default function App() {
       <BrowserRouter>
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
+            <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 
@@ -97,7 +99,7 @@ export default function App() {
               </Route>
             </Route>
 
-            <Route path="*" element={<Navigate to={isAuthenticated ? '/wallet' : '/login'} replace />} />
+            <Route path="*" element={<Navigate to={isAuthenticated ? '/wallet' : '/'} replace />} />
           </Routes>
         </Suspense>
       </BrowserRouter>
