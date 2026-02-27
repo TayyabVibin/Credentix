@@ -5,27 +5,24 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
-import { lightTheme, darkTheme } from './theme.ts';
-import Layout from './components/Layout.tsx';
-import AdminLayout from './components/AdminLayout.tsx';
-import ProtectedRoute from './components/ProtectedRoute.tsx';
-import AdminRoute from './components/AdminRoute.tsx';
-import { useAppDispatch, useAppSelector } from './store/hooks.ts';
-import { fetchProfile } from './store/authSlice.ts';
-import { API_ERROR_EVENT } from './utils/apiErrorEvent.ts';
+import { lightTheme, darkTheme } from './design-system/theme';
+import { MainLayout, AdminLayout, ProtectedRoute, AdminRoute } from './layout';
+import { useAppDispatch, useAppSelector } from './store/hooks';
+import { fetchProfile } from './store/authSlice';
+import { API_ERROR_EVENT } from './utils/apiErrorEvent';
 
-const HomePage = lazy(() => import('./pages/HomePage.tsx'));
-const LoginPage = lazy(() => import('./pages/LoginPage.tsx'));
-const RegisterPage = lazy(() => import('./pages/RegisterPage.tsx'));
-const WalletPage = lazy(() => import('./pages/WalletPage.tsx'));
-const PurchasePage = lazy(() => import('./pages/PurchasePage.tsx'));
-const PurchaseProcessingPage = lazy(() => import('./pages/PurchaseProcessingPage.tsx'));
-const TransactionsPage = lazy(() => import('./pages/TransactionsPage.tsx'));
-const ProfilePage = lazy(() => import('./pages/ProfilePage.tsx'));
-const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage.tsx'));
-const AdminPaymentsPage = lazy(() => import('./pages/admin/AdminPaymentsPage.tsx'));
-const AdminPaymentDetailPage = lazy(() => import('./pages/admin/AdminPaymentDetailPage.tsx'));
-const AdminWebhooksPage = lazy(() => import('./pages/admin/AdminWebhooksPage.tsx'));
+const HomePage = lazy(() => import('./features/landing/HomePage'));
+const LoginPage = lazy(() => import('./features/auth/LoginPage'));
+const RegisterPage = lazy(() => import('./features/auth/RegisterPage'));
+const WalletPage = lazy(() => import('./features/wallet/WalletPage'));
+const PurchasePage = lazy(() => import('./features/purchase/PurchasePage'));
+const PurchaseProcessingPage = lazy(() => import('./features/purchase/PurchaseProcessingPage'));
+const TransactionsPage = lazy(() => import('./features/transactions/TransactionsPage'));
+const ProfilePage = lazy(() => import('./features/profile/ProfilePage'));
+const AdminDashboardPage = lazy(() => import('./features/admin/AdminDashboardPage'));
+const AdminPaymentsPage = lazy(() => import('./features/admin/AdminPaymentsPage'));
+const AdminPaymentDetailPage = lazy(() => import('./features/admin/AdminPaymentDetailPage'));
+const AdminWebhooksPage = lazy(() => import('./features/admin/AdminWebhooksPage'));
 
 function LoadingFallback() {
   return (
@@ -80,7 +77,7 @@ export default function App() {
             <Route path="/register" element={<RegisterPage />} />
 
             <Route element={<ProtectedRoute />}>
-              <Route element={<Layout themeMode={mode} onThemeToggle={toggleTheme} />}>
+              <Route element={<MainLayout themeMode={mode} onThemeToggle={toggleTheme} />}>
                 <Route path="/wallet" element={<WalletPage />} />
                 <Route path="/purchase" element={<PurchasePage />} />
                 <Route path="/purchase/processing" element={<PurchaseProcessingPage />} />
