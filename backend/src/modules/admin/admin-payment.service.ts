@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between, ILike } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Payment } from '../payment/entities/payment.entity';
 import { PaymentStatus } from '../../common/enums/payment-status.enum';
 import {
@@ -39,7 +39,7 @@ export class AdminPaymentService {
     const qb = this.paymentRepo
       .createQueryBuilder('p')
       .leftJoinAndSelect('p.user', 'u')
-      .orderBy('p.created_at', 'DESC');
+      .orderBy('p.createdAt', 'DESC');
 
     if (query.status) {
       qb.andWhere('p.status = :status', { status: query.status });
@@ -49,17 +49,17 @@ export class AdminPaymentService {
     }
     if (query.search) {
       qb.andWhere(
-        '(p.merchant_reference ILIKE :search OR p.psp_reference ILIKE :search OR u.email ILIKE :search)',
+        '(p.merchantReference ILIKE :search OR p.pspReference ILIKE :search OR u.email ILIKE :search)',
         { search: `%${query.search}%` },
       );
     }
     if (query.dateFrom) {
-      qb.andWhere('p.created_at >= :dateFrom', {
+      qb.andWhere('p.createdAt >= :dateFrom', {
         dateFrom: new Date(query.dateFrom),
       });
     }
     if (query.dateTo) {
-      qb.andWhere('p.created_at <= :dateTo', {
+      qb.andWhere('p.createdAt <= :dateTo', {
         dateTo: new Date(query.dateTo),
       });
     }

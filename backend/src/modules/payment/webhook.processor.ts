@@ -43,6 +43,7 @@ const EVENT_STATUS_MAP: Record<
 export class WebhookProcessor {
   private readonly logger = new Logger(WebhookProcessor.name);
   private readonly hmacKey: string;
+  private readonly captureDelayHours: number;
 
   constructor(
     @InjectRepository(WebhookLog)
@@ -51,6 +52,7 @@ export class WebhookProcessor {
     private readonly config: ConfigService,
   ) {
     this.hmacKey = this.config.get<string>('ADYEN_WEBHOOK_HMAC_KEY', '');
+    this.captureDelayHours = this.config.get<number>('CAPTURE_DELAY_HOURS', 0);
   }
 
   verifyHmac(payload: string, hmacSignature: string): boolean {
@@ -87,7 +89,7 @@ export class WebhookProcessor {
   private async processNotification(
     notification: AdyenNotificationItem['NotificationRequestItem'],
   ): Promise<void> {
-    const { pspReference, eventCode, success, merchantReference, reason } =
+    const { pspReference, originalReference, eventCode, success, merchantReference, reason } =
       notification;
     const isSuccess = success === 'true';
 
@@ -114,6 +116,9 @@ export class WebhookProcessor {
     try {
       let payment = await this.paymentService.findByPspReference(pspReference);
 
+      if (!payment && originalReference) {
+        payment = await this.paymentService.findByPspReference(originalReference);
+      }
       if (!payment) {
         payment =
           await this.paymentService.findByMerchantReference(merchantReference);
@@ -121,7 +126,7 @@ export class WebhookProcessor {
 
       if (!payment) {
         this.logger.warn(
-          `Payment not found for psp=${this.maskRef(pspReference)}, ref=${merchantReference}`,
+          `Payment not found for psp=${this.maskRef(pspReference)}, originalRef=${originalReference ? this.maskRef(originalReference) : 'n/a'}, merchantRef=${merchantReference}`,
         );
         log.errorMessage = 'Payment not found';
         log.processedAt = new Date();
@@ -184,8 +189,16 @@ export class WebhookProcessor {
     const mapping = EVENT_STATUS_MAP[eventCode];
     if (!mapping) return null;
 
-    if (isSuccess) return mapping.success;
-    return mapping.failure ?? null;
+    if (!isSuccess) return mapping.failure ?? null;
+
+    if (
+      eventCode === 'AUTHORISATION' &&
+      this.captureDelayHours === 0
+    ) {
+      return PaymentStatus.CAPTURED;
+    }
+
+    return mapping.success;
   }
 
   computeHash(

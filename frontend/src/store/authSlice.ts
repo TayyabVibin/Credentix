@@ -1,10 +1,17 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../api/client.ts';
 
-interface User {
+export interface User {
   id: string;
   email: string;
   role: 'USER' | 'ADMIN';
+  fullName: string | null;
+  company: string | null;
+  userTitle: string | null;
+  useCase: string | null;
+  avatarUrl: string | null;
+  country: string | null;
+  businessType: string | null;
   createdAt: string;
 }
 
@@ -55,6 +62,19 @@ export const fetchProfile = createAsyncThunk('auth/fetchProfile', async () => {
   return res.data as User;
 });
 
+export const updateProfile = createAsyncThunk(
+  'auth/updateProfile',
+  async (data: Partial<Omit<User, 'id' | 'role' | 'createdAt'>>, { rejectWithValue }) => {
+    try {
+      const res = await api.patch('/auth/me', data);
+      return res.data as User;
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(error.response?.data?.message ?? 'Profile update failed');
+    }
+  },
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -102,6 +122,9 @@ const authSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(fetchProfile.fulfilled, (state, action) => {
+        state.user = action.payload;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
         state.user = action.payload;
       });
   },

@@ -28,7 +28,11 @@ import { LedgerEntry } from './modules/wallet/entities/ledger-entry.entity';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres' as const,
-        url: config.getOrThrow<string>('DATABASE_URL'),
+        host: config.getOrThrow<string>('DB_HOST'),
+        port: parseInt(config.get('POSTGRES_PORT', '5432'), 10),
+        username: config.getOrThrow<string>('POSTGRES_USER'),
+        password: config.getOrThrow<string>('POSTGRES_PASSWORD'),
+        database: config.getOrThrow<string>('POSTGRES_DB'),
         entities: [User, Payment, PaymentEvent, WebhookLog, LedgerEntry],
         synchronize: config.get('NODE_ENV') !== 'production',
         logging: config.get('NODE_ENV') === 'development',

@@ -5,7 +5,13 @@ import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 
-const REQUIRED_ENV_VARS = ['DATABASE_URL', 'JWT_SECRET'];
+const REQUIRED_ENV_VARS = [
+  'DB_HOST',
+  'POSTGRES_USER',
+  'POSTGRES_PASSWORD',
+  'POSTGRES_DB',
+  'JWT_SECRET',
+];
 
 function validateEnv(): void {
   const logger = new Logger('Bootstrap');

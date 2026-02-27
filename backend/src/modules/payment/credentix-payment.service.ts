@@ -81,6 +81,13 @@ export class CredentixPaymentService {
     source: string,
     payload?: Record<string, unknown>,
   ): Promise<Payment> {
+    if (payment.status === newStatus) {
+      this.logger.log(
+        `Payment ${payment.id} already in ${newStatus}, skipping transition`,
+      );
+      return payment;
+    }
+
     PaymentStateMachine.assertTransition(payment.status, newStatus);
 
     const fromStatus = payment.status;
@@ -90,6 +97,9 @@ export class CredentixPaymentService {
       payment.authorizedAt = new Date();
     }
     if (newStatus === PaymentStatus.CAPTURED) {
+      if (!payment.authorizedAt) {
+        payment.authorizedAt = new Date();
+      }
       payment.capturedAt = new Date();
     }
 

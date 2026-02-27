@@ -5,6 +5,7 @@ describe('PaymentStateMachine', () => {
   describe('valid transitions from INITIATED', () => {
     const validTargets = [
       PaymentStatus.AUTHORIZED,
+      PaymentStatus.CAPTURED,
       PaymentStatus.FAILED,
       PaymentStatus.REFUSED,
       PaymentStatus.CANCELED,
@@ -76,15 +77,6 @@ describe('PaymentStateMachine', () => {
   });
 
   describe('invalid transitions throw', () => {
-    it('INITIATED → CAPTURED should throw', () => {
-      expect(() =>
-        PaymentStateMachine.assertTransition(
-          PaymentStatus.INITIATED,
-          PaymentStatus.CAPTURED,
-        ),
-      ).toThrow('Invalid payment state transition');
-    });
-
     it('AUTHORIZED → AUTHORIZED should throw', () => {
       expect(() =>
         PaymentStateMachine.assertTransition(
@@ -128,7 +120,7 @@ describe('PaymentStateMachine', () => {
         PaymentStatus.INITIATED,
       );
       expect(allowed).toContain(PaymentStatus.AUTHORIZED);
-      expect(allowed).not.toContain(PaymentStatus.CAPTURED);
+      expect(allowed).toContain(PaymentStatus.CAPTURED);
     });
 
     it('returns empty array for terminal states', () => {

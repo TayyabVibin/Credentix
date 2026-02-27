@@ -1,0 +1,12 @@
+{
+  "name": "credentix",
+  "private": true,
+  "scripts": {
+    "test:functional": "node scripts/functional-tests.mjs",
+    "docker:up": "docker-compose up --build",
+    "docker:down": "docker-compose down --remove-orphans"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  }
+}

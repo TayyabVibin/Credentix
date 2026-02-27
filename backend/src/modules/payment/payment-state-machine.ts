@@ -4,6 +4,7 @@ import { PaymentStatus } from '../../common/enums/payment-status.enum';
 const VALID_TRANSITIONS: Record<string, PaymentStatus[]> = {
   [PaymentStatus.INITIATED]: [
     PaymentStatus.AUTHORIZED,
+    PaymentStatus.CAPTURED,
     PaymentStatus.FAILED,
     PaymentStatus.REFUSED,
     PaymentStatus.CANCELED,
