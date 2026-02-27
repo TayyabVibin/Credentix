@@ -28,10 +28,15 @@ import { LedgerEntry } from './modules/wallet/entities/ledger-entry.entity';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const databaseUrl = config.get<string>('DATABASE_URL');
+        const syncEnv = config.get<string>('DB_SYNCHRONIZE');
+        const synchronize =
+          syncEnv === 'true' ||
+          syncEnv === '1' ||
+          (config.get('NODE_ENV') !== 'production' && syncEnv !== 'false');
         const baseConfig = {
           type: 'postgres' as const,
           entities: [User, Payment, PaymentEvent, WebhookLog, LedgerEntry],
-          synchronize: config.get('NODE_ENV') !== 'production',
+          synchronize,
           logging: config.get('NODE_ENV') === 'development',
           ssl: true,
         };
