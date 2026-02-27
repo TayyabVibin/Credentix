@@ -8,17 +8,16 @@ import Grid from '@mui/material/Grid';
 import { useTheme } from '@mui/material/styles';
 import { motion, useInView, animate, useScroll, useTransform } from 'framer-motion';
 import Lottie from 'lottie-react';
-import { StaggeredReveal } from '../../motion';
 import CredentixLogo from '../../design-system/primitives/CredentixLogo';
 import { useAppSelector } from '../../store/hooks';
 import { gradients } from '../../design-system/tokens';
 import heroAnim from '../../assets/animations/online payment.json';
-import cardPaymentAnim from '../../assets/animations/Cards payment.json';
 import processingAnim from '../../assets/animations/Card payment in Process.json';
-import analyticsAnim from '../../assets/animations/Data Analytics.json';
 import coinAnim from '../../assets/animations/Turning Coin.json';
 import walletAnim from '../../assets/animations/coin circling wallet.json';
 import gatewayAnim from '../../assets/animations/Mobile App Payment Gateway.json';
+import dataSecurityAnim from '../../assets/animations/DATA SECURITY.json';
+import webhookAnim from '../../assets/animations/inweb.json';
 
 const getGlassStyles = (isDark: boolean) => ({
   backdropFilter: 'blur(16px)',
@@ -63,7 +62,7 @@ const features = [
   {
     title: 'Card Payment Integration',
     description: 'Enterprise-grade Adyen payment processing with PCI-compliant Drop-in UI for secure card transactions.',
-    animation: cardPaymentAnim,
+    animation: gatewayAnim,
   },
   {
     title: 'Real-Time Processing',
@@ -73,12 +72,12 @@ const features = [
   {
     title: 'Webhook Architecture',
     description: 'Idempotent webhook processing with HMAC verification, retry handling, and full audit trail.',
-    animation: analyticsAnim,
+    animation: webhookAnim,
   },
   {
     title: 'Secure Infrastructure',
     description: 'JWT authentication, role-based access control, encrypted storage, and enterprise observability.',
-    animation: gatewayAnim,
+    animation: dataSecurityAnim,
   },
 ];
 
@@ -93,7 +92,7 @@ const creditBenefits = [
 
 const metrics = [
   { label: 'Uptime', value: 99.9, suffix: '%' },
-  { label: 'Transactions Processed', value: 150000, suffix: '+' },
+  { label: 'Transactions Processed', value: 50000, suffix: '+' },
   { label: 'Average Latency', value: 120, suffix: 'ms' },
   { label: 'Webhook Delivery', value: 99.7, suffix: '%' },
 ];
@@ -111,7 +110,7 @@ export default function HomePage() {
   const metricsRef = useRef(null);
 
   const heroInView = useInView(heroRef, { once: true });
-  const featuresInView = useInView(featuresRef, { once: true, margin: '-80px' });
+  const featuresInView = useInView(featuresRef, { once: true, margin: '-50px', amount: 0.1 });
 
   const { scrollY } = useScroll();
   const heroBackgroundY = useTransform(scrollY, [0, 400], [0, 80]);
@@ -213,17 +212,24 @@ export default function HomePage() {
             </Typography>
           </motion.div>
           <Grid container spacing={4}>
-            <StaggeredReveal staggerDelay={0.1} trigger={featuresInView}>
-              {features.map((f) => (
-                <Grid size={{ xs: 12, sm: 6 }} key={f.title}>
-                  <Box sx={{ ...GLASS, p: 4, height: '100%', transition: 'all 0.3s ease', '&:hover': { border: '1px solid', borderColor: 'primary.main', boxShadow: isDark ? '0 8px 40px rgba(5,150,105,0.08)' : '0 8px 32px rgba(4,120,87,0.12)', transform: 'translateY(-4px)' } }}>
-                    <Box sx={{ maxWidth: 120, mb: 3 }}><Lottie animationData={f.animation} loop /></Box>
-                    <Typography variant="h6" fontWeight={700} sx={{ mb: 1.5 }}>{f.title}</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.7 }}>{f.description}</Typography>
+            {features.map((f, i) => (
+              <Grid size={{ xs: 12, sm: 6, md: 6 }} key={f.title}>
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={featuresInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ delay: i * 0.1, duration: 0.5, ease: 'easeOut' }}
+                  style={{ height: '100%' }}
+                >
+                  <Box sx={{ ...GLASS, p: 4, height: '100%', minHeight: 280, transition: 'all 0.3s ease', '&:hover': { border: '1px solid', borderColor: 'primary.main', boxShadow: isDark ? '0 8px 40px rgba(5,150,105,0.08)' : '0 8px 32px rgba(4,120,87,0.12)', transform: 'translateY(-4px)' } }}>
+                    <Box sx={{ width: 160, height: 120, mb: 3, flexShrink: 0 }}>
+                      <Lottie animationData={f.animation} loop style={{ width: '100%', height: '100%', minHeight: 80 }} />
+                    </Box>
+                    <Typography variant="h6" fontWeight={700} sx={{ mb: 1.5, fontSize: '1.1rem' }}>{f.title}</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.7, fontSize: '0.95rem' }}>{f.description}</Typography>
                   </Box>
-                </Grid>
-              ))}
-            </StaggeredReveal>
+                </motion.div>
+              </Grid>
+            ))}
           </Grid>
         </Container>
       </Box>
