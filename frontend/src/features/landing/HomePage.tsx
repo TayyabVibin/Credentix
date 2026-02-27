@@ -168,8 +168,8 @@ export default function HomePage() {
               ? 'radial-gradient(ellipse at 50% 0%, rgba(5,150,105,0.08) 0%, transparent 60%), radial-gradient(ellipse at 80% 50%, rgba(217,119,6,0.05) 0%, transparent 50%)'
               : 'radial-gradient(ellipse at 50% 0%, rgba(5,150,105,0.06) 0%, transparent 60%)',
             pointerEvents: 'none',
+            y: heroBackgroundY,
           }}
-          y={heroBackgroundY}
         />
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
           <Grid container spacing={6} alignItems="center">

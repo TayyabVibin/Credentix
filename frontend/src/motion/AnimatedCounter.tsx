@@ -6,7 +6,6 @@ interface Props {
   format?: (n: number) => string;
   prefix?: string;
   suffix?: string;
-  duration?: number;
 }
 
 export default function AnimatedCounter({
@@ -14,7 +13,6 @@ export default function AnimatedCounter({
   format = (n) => n.toLocaleString(),
   prefix = '',
   suffix = '',
-  duration = 0.5,
 }: Props) {
   const [displayValue, setDisplayValue] = useState(value);
   const spring = useSpring(value, { stiffness: 120, damping: 28 });
