@@ -8,7 +8,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { chartColors, chartTheme } from './ChartTheme';
+import { useTheme } from '@mui/material/styles';
+import { getChartTheme } from './ChartTheme';
 
 interface DataPoint {
   date: string;
@@ -21,6 +22,10 @@ interface Props {
 }
 
 export default function VolumeChart({ data, formatAmount }: Props) {
+  const theme = useTheme();
+  const chartTheme = getChartTheme(theme.palette.mode);
+  const { colors } = chartTheme;
+
   const chartData = data.map((d) => ({
     ...d,
     amount: d.amountMinor / 100,
@@ -37,9 +42,16 @@ export default function VolumeChart({ data, formatAmount }: Props) {
         <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="volumeGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={chartColors.primary} stopOpacity={0.4} />
-              <stop offset="100%" stopColor={chartColors.primary} stopOpacity={0} />
+              <stop offset="0%" stopColor={colors.primary} stopOpacity={0.5} />
+              <stop offset="100%" stopColor={colors.primary} stopOpacity={0} />
             </linearGradient>
+            <filter id="volumeGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
           </defs>
           <CartesianGrid strokeDasharray="4 4" stroke={chartTheme.grid.stroke} vertical={false} />
           <XAxis
@@ -62,9 +74,13 @@ export default function VolumeChart({ data, formatAmount }: Props) {
           <Area
             type="monotone"
             dataKey="amount"
-            stroke={chartColors.primary}
+            stroke={colors.primary}
             strokeWidth={2}
             fill="url(#volumeGradient)"
+            filter="url(#volumeGlow)"
+            isAnimationActive
+            animationDuration={800}
+            animationEasing="ease-out"
           />
         </AreaChart>
       </ResponsiveContainer>

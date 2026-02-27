@@ -5,8 +5,11 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
-import { motion, useInView, animate } from 'framer-motion';
+import { useTheme } from '@mui/material/styles';
+import { motion, useInView, animate, useScroll, useTransform } from 'framer-motion';
 import Lottie from 'lottie-react';
+import { StaggeredReveal } from '../../motion';
+import CredentixLogo from '../../design-system/primitives/CredentixLogo';
 import { useAppSelector } from '../../store/hooks';
 import { gradients } from '../../design-system/tokens';
 import heroAnim from '../../assets/animations/online payment.json';
@@ -17,12 +20,12 @@ import coinAnim from '../../assets/animations/Turning Coin.json';
 import walletAnim from '../../assets/animations/coin circling wallet.json';
 import gatewayAnim from '../../assets/animations/Mobile App Payment Gateway.json';
 
-const GLASS = {
+const getGlassStyles = (isDark: boolean) => ({
   backdropFilter: 'blur(16px)',
-  bgcolor: 'rgba(30,41,59,0.55)',
-  border: '1px solid rgba(255,255,255,0.08)',
+  bgcolor: isDark ? 'rgba(30,41,59,0.55)' : 'rgba(255,255,255,0.8)',
+  border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.06)',
   borderRadius: 4,
-};
+});
 
 function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: string }) {
   const [value, setValue] = useState(0);
@@ -97,7 +100,10 @@ const metrics = [
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const theme = useTheme();
   const { isAuthenticated } = useAppSelector((s) => s.auth);
+  const isDark = theme.palette.mode === 'dark';
+  const GLASS = getGlassStyles(isDark);
 
   const heroRef = useRef(null);
   const featuresRef = useRef(null);
@@ -106,11 +112,14 @@ export default function HomePage() {
 
   const heroInView = useInView(heroRef, { once: true });
   const featuresInView = useInView(featuresRef, { once: true, margin: '-80px' });
+
+  const { scrollY } = useScroll();
+  const heroBackgroundY = useTransform(scrollY, [0, 400], [0, 80]);
   const creditsInView = useInView(creditsRef, { once: true, margin: '-80px' });
   const metricsInView = useInView(metricsRef, { once: true, margin: '-80px' });
 
   return (
-    <Box sx={{ bgcolor: '#0A0C10', color: '#F1F5F9', minHeight: '100vh', overflow: 'hidden' }}>
+    <Box sx={{ bgcolor: 'background.default', color: 'text.primary', minHeight: '100vh', overflow: 'hidden' }}>
       <Box
         component="nav"
         sx={{
@@ -120,15 +129,17 @@ export default function HomePage() {
           right: 0,
           zIndex: 100,
           backdropFilter: 'blur(20px)',
-          bgcolor: 'rgba(10,12,16,0.85)',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          bgcolor: isDark ? 'rgba(13,15,18,0.85)' : 'rgba(250,250,249,0.9)',
+          borderBottom: '1px solid',
+          borderColor: 'divider',
         }}
       >
         <Container maxWidth="lg">
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 2 }}>
-            <Typography variant="h5" fontWeight={800} sx={{ background: gradients.hero, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              Credentix
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, color: 'primary.main' }}>
+              <CredentixLogo size={28} color="currentColor" />
+              <Typography variant="h5" fontWeight={800}>Credentix</Typography>
+            </Box>
             <Box sx={{ display: 'flex', gap: 1.5 }}>
               {isAuthenticated ? (
                 <Button variant="contained" onClick={() => navigate('/wallet')} sx={{ px: 3 }}>
@@ -136,7 +147,7 @@ export default function HomePage() {
                 </Button>
               ) : (
                 <>
-                  <Button variant="text" sx={{ color: '#94A3B8' }} onClick={() => navigate('/login')}>
+                  <Button variant="text" sx={{ color: 'text.secondary' }} onClick={() => navigate('/login')}>
                     Sign In
                   </Button>
                   <Button variant="contained" onClick={() => navigate('/register')} sx={{ px: 3 }}>
@@ -150,22 +161,32 @@ export default function HomePage() {
       </Box>
 
       <Box ref={heroRef} sx={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', pt: 10, overflow: 'hidden' }}>
-        <Box sx={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 0%, rgba(0,229,255,0.08) 0%, transparent 60%), radial-gradient(ellipse at 80% 50%, rgba(139,92,246,0.06) 0%, transparent 50%)' }} />
+        <motion.div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: isDark
+              ? 'radial-gradient(ellipse at 50% 0%, rgba(5,150,105,0.08) 0%, transparent 60%), radial-gradient(ellipse at 80% 50%, rgba(217,119,6,0.05) 0%, transparent 50%)'
+              : 'radial-gradient(ellipse at 50% 0%, rgba(5,150,105,0.06) 0%, transparent 60%)',
+            pointerEvents: 'none',
+          }}
+          y={heroBackgroundY}
+        />
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
           <Grid container spacing={6} alignItems="center">
             <Grid size={{ xs: 12, md: 6 }}>
               <motion.div initial={{ opacity: 0, x: -40 }} animate={heroInView ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.7 }}>
-                <Typography variant="h1" sx={{ fontSize: { xs: '2.5rem', md: '3.75rem' }, fontWeight: 900, lineHeight: 1.1, mb: 3, background: gradients.hero, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                <Typography variant="display" sx={{ fontSize: { xs: '2.5rem', md: '3.5rem' }, lineHeight: 1.1, mb: 3, background: gradients.hero, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                   Next-Generation Credit Payment Infrastructure
                 </Typography>
-                <Typography variant="h6" sx={{ color: '#94A3B8', fontWeight: 400, lineHeight: 1.7, mb: 4, maxWidth: 520 }}>
+                <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 400, lineHeight: 1.7, mb: 4, maxWidth: 520 }}>
                   Enterprise-grade payment processing powered by Adyen. Purchase credits, manage wallets, and process transactions with real-time webhook handling.
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                   <Button variant="contained" size="large" onClick={() => navigate(isAuthenticated ? '/wallet' : '/register')} sx={{ px: 4, py: 1.5, fontSize: '1rem' }}>
                     Get Started
                   </Button>
-                  <Button variant="outlined" size="large" onClick={() => navigate(isAuthenticated ? '/wallet' : '/login')} sx={{ px: 4, py: 1.5, fontSize: '1rem', borderColor: 'rgba(255,255,255,0.15)', color: '#F1F5F9', '&:hover': { borderColor: 'rgba(255,255,255,0.3)', bgcolor: 'rgba(255,255,255,0.04)' } }}>
+                  <Button variant="outlined" size="large" onClick={() => navigate(isAuthenticated ? '/wallet' : '/login')} sx={{ px: 4, py: 1.5, fontSize: '1rem' }}>
                     Explore Dashboard
                   </Button>
                 </Box>
@@ -183,26 +204,26 @@ export default function HomePage() {
       </Box>
 
       <Box ref={featuresRef} sx={{ py: { xs: 10, md: 16 }, position: 'relative' }}>
-        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,229,255,0.04) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 600, height: 600, borderRadius: '50%', background: isDark ? 'radial-gradient(circle, rgba(5,150,105,0.04) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(5,150,105,0.03) 0%, transparent 70%)', pointerEvents: 'none' }} />
         <Container maxWidth="lg">
           <motion.div initial="hidden" animate={featuresInView ? 'visible' : 'hidden'} variants={fadeUp} custom={0}>
             <Typography variant="h3" fontWeight={800} textAlign="center" sx={{ mb: 2 }}>Built for Modern Fintech</Typography>
-            <Typography variant="h6" textAlign="center" sx={{ mb: 8, maxWidth: 600, mx: 'auto', color: '#94A3B8' }}>
+            <Typography variant="h6" textAlign="center" sx={{ mb: 8, maxWidth: 600, mx: 'auto', color: 'text.secondary' }}>
               A complete payment infrastructure with enterprise-grade reliability, security, and developer experience.
             </Typography>
           </motion.div>
           <Grid container spacing={4}>
-            {features.map((f, i) => (
-              <Grid size={{ xs: 12, sm: 6 }} key={f.title}>
-                <motion.div initial="hidden" animate={featuresInView ? 'visible' : 'hidden'} variants={fadeUp} custom={i + 1} style={{ height: '100%' }}>
-                  <Box sx={{ ...GLASS, p: 4, height: '100%', transition: 'all 0.3s ease', '&:hover': { border: '1px solid rgba(0,229,255,0.2)', boxShadow: '0 8px 40px rgba(0,229,255,0.08)', transform: 'translateY(-4px)' } }}>
+            <StaggeredReveal staggerDelay={0.1} trigger={featuresInView}>
+              {features.map((f) => (
+                <Grid size={{ xs: 12, sm: 6 }} key={f.title}>
+                  <Box sx={{ ...GLASS, p: 4, height: '100%', transition: 'all 0.3s ease', '&:hover': { border: '1px solid', borderColor: 'primary.main', boxShadow: isDark ? '0 8px 40px rgba(5,150,105,0.08)' : '0 8px 32px rgba(4,120,87,0.12)', transform: 'translateY(-4px)' } }}>
                     <Box sx={{ maxWidth: 120, mb: 3 }}><Lottie animationData={f.animation} loop /></Box>
                     <Typography variant="h6" fontWeight={700} sx={{ mb: 1.5 }}>{f.title}</Typography>
-                    <Typography variant="body2" sx={{ color: '#94A3B8', lineHeight: 1.7 }}>{f.description}</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.7 }}>{f.description}</Typography>
                   </Box>
-                </motion.div>
-              </Grid>
-            ))}
+                </Grid>
+              ))}
+            </StaggeredReveal>
           </Grid>
         </Container>
       </Box>
@@ -218,7 +239,7 @@ export default function HomePage() {
             <Grid size={{ xs: 12, md: 7 }}>
               <motion.div initial="hidden" animate={creditsInView ? 'visible' : 'hidden'} variants={fadeUp} custom={0}>
                 <Typography variant="h3" fontWeight={800} sx={{ mb: 2 }}>Why Credits?</Typography>
-                <Typography variant="body1" sx={{ color: '#94A3B8', mb: 4, lineHeight: 1.8, maxWidth: 540 }}>
+                <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4, lineHeight: 1.8, maxWidth: 540 }}>
                   Credits provide a flexible, prepaid consumption model that gives you full control over your spending.
                 </Typography>
               </motion.div>
@@ -226,8 +247,8 @@ export default function HomePage() {
                 {creditBenefits.map((b, i) => (
                   <motion.div key={b} initial="hidden" animate={creditsInView ? 'visible' : 'hidden'} variants={fadeUp} custom={i + 1}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 1.5, px: 2.5, ...GLASS, borderRadius: 2 }}>
-                      <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#00E5FF', flexShrink: 0 }} />
-                      <Typography variant="body2" sx={{ color: '#CBD5E1' }}>{b}</Typography>
+                      <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'primary.main', flexShrink: 0 }} />
+                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>{b}</Typography>
                     </Box>
                   </motion.div>
                 ))}
@@ -238,7 +259,7 @@ export default function HomePage() {
             <motion.div initial={{ opacity: 0, y: 30 }} animate={creditsInView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.6, duration: 0.6 }}>
               <Box sx={{ maxWidth: 300, mx: 'auto', mb: 3 }}><Lottie animationData={walletAnim} loop /></Box>
               <Typography variant="h5" fontWeight={700} sx={{ mb: 1 }}>Your Wallet, Your Control</Typography>
-              <Typography variant="body1" sx={{ color: '#94A3B8', maxWidth: 500, mx: 'auto' }}>
+              <Typography variant="body1" sx={{ color: 'text.secondary', maxWidth: 500, mx: 'auto' }}>
                 Track every credit in real-time with a full transaction ledger, instant balance updates, and complete spending visibility.
               </Typography>
             </motion.div>
@@ -250,17 +271,17 @@ export default function HomePage() {
         <Container maxWidth="lg">
           <motion.div initial="hidden" animate={metricsInView ? 'visible' : 'hidden'} variants={fadeUp} custom={0}>
             <Typography variant="h3" fontWeight={800} textAlign="center" sx={{ mb: 2 }}>Trusted Infrastructure</Typography>
-            <Typography variant="h6" textAlign="center" sx={{ color: '#94A3B8', mb: 8, maxWidth: 500, mx: 'auto' }}>Built for reliability at scale with enterprise-grade monitoring.</Typography>
+            <Typography variant="h6" textAlign="center" sx={{ color: 'text.secondary', mb: 8, maxWidth: 500, mx: 'auto' }}>Built for reliability at scale with enterprise-grade monitoring.</Typography>
           </motion.div>
           <Grid container spacing={3}>
             {metrics.map((m, i) => (
               <Grid size={{ xs: 6, md: 3 }} key={m.label}>
                 <motion.div initial="hidden" animate={metricsInView ? 'visible' : 'hidden'} variants={fadeUp} custom={i + 1}>
-                  <Box sx={{ ...GLASS, p: 4, textAlign: 'center', transition: 'all 0.3s ease', '&:hover': { border: '1px solid rgba(0,229,255,0.2)', boxShadow: '0 8px 40px rgba(0,229,255,0.06)' } }}>
+                  <Box sx={{ ...GLASS, p: 4, textAlign: 'center', transition: 'all 0.3s ease', '&:hover': { border: '1px solid', borderColor: 'primary.main', boxShadow: isDark ? '0 8px 40px rgba(5,150,105,0.06)' : '0 8px 32px rgba(4,120,87,0.1)' } }}>
                     <Typography variant="h3" fontWeight={900} sx={{ background: gradients.hero, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', mb: 1 }}>
                       <AnimatedCounter target={m.value} suffix={m.suffix} />
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#94A3B8', fontWeight: 500 }}>{m.label}</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>{m.label}</Typography>
                   </Box>
                 </motion.div>
               </Grid>
@@ -270,11 +291,11 @@ export default function HomePage() {
       </Box>
 
       <Box sx={{ py: { xs: 10, md: 16 }, textAlign: 'center', position: 'relative' }}>
-        <Box sx={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 100%, rgba(0,229,255,0.08) 0%, transparent 60%)', pointerEvents: 'none' }} />
+        <Box sx={{ position: 'absolute', inset: 0, background: isDark ? 'radial-gradient(ellipse at 50% 100%, rgba(5,150,105,0.08) 0%, transparent 60%)' : 'radial-gradient(ellipse at 50% 100%, rgba(5,150,105,0.05) 0%, transparent 60%)', pointerEvents: 'none' }} />
         <Container maxWidth="sm" sx={{ position: 'relative' }}>
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <Typography variant="h3" fontWeight={800} sx={{ mb: 2 }}>Ready to Get Started?</Typography>
-            <Typography variant="h6" sx={{ color: '#94A3B8', mb: 5 }}>Join Credentix and experience premium payment infrastructure.</Typography>
+            <Typography variant="h6" sx={{ color: 'text.secondary', mb: 5 }}>Join Credentix and experience premium payment infrastructure.</Typography>
             <Button variant="contained" size="large" onClick={() => navigate(isAuthenticated ? '/wallet' : '/register')} sx={{ px: 6, py: 2, fontSize: '1.1rem' }}>
               Create Free Account
             </Button>
@@ -282,11 +303,11 @@ export default function HomePage() {
         </Container>
       </Box>
 
-      <Box sx={{ borderTop: '1px solid rgba(255,255,255,0.06)', py: 4 }}>
+      <Box sx={{ borderTop: 1, borderColor: 'divider', py: 4 }}>
         <Container maxWidth="lg">
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-            <Typography variant="body2" sx={{ color: '#64748B' }}>{new Date().getFullYear()} Credentix. All rights reserved.</Typography>
-            <Typography variant="body2" sx={{ background: gradients.hero, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontWeight: 600 }}>Credentix</Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>{new Date().getFullYear()} Credentix. All rights reserved.</Typography>
+            <Typography variant="body2" sx={{ color: 'primary.main', fontWeight: 600 }}>Credentix</Typography>
           </Box>
         </Container>
       </Box>

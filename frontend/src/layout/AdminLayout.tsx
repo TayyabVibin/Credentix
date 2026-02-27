@@ -3,7 +3,6 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -15,20 +14,16 @@ import ListItemText from '@mui/material/ListItemText';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import MenuRounded from '@mui/icons-material/MenuRounded';
-import DashboardRounded from '@mui/icons-material/DashboardRounded';
-import PaymentRounded from '@mui/icons-material/PaymentRounded';
-import WebhookRounded from '@mui/icons-material/WebhookRounded';
-import HomeRounded from '@mui/icons-material/HomeRounded';
-import LogoutRounded from '@mui/icons-material/LogoutRounded';
+import Icon from '../design-system/primitives/Icon';
+import NavRail from './NavRail';
 import ThemeToggle from './ThemeToggle';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { logout } from '../store/authSlice';
-import { gradients } from '../design-system/tokens';
 
 const ADMIN_NAV = [
-  { label: 'Dashboard', path: '/admin', icon: <DashboardRounded /> },
-  { label: 'Payments', path: '/admin/payments', icon: <PaymentRounded /> },
-  { label: 'Webhooks', path: '/admin/webhooks', icon: <WebhookRounded /> },
+  { label: 'Dashboard', path: '/admin', icon: <Icon name="dashboard" size={20} /> },
+  { label: 'Payments', path: '/admin/payments', icon: <Icon name="payment" size={20} /> },
+  { label: 'Webhooks', path: '/admin/webhooks', icon: <Icon name="webhook" size={20} /> },
 ];
 
 interface Props {
@@ -43,7 +38,7 @@ export default function AdminLayout({ themeMode, onThemeToggle }: Props) {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((s) => s.auth);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
 
   const handleLogout = () => {
     dispatch(logout());
@@ -56,17 +51,9 @@ export default function AdminLayout({ themeMode, onThemeToggle }: Props) {
   };
 
   const drawerContent = (
-    <Box sx={{ width: 260, pt: 2 }}>
+    <Box sx={{ width: 260, pt: 2, height: '100%', bgcolor: 'background.paper' }}>
       <Box sx={{ px: 3, pb: 2, borderBottom: 1, borderColor: 'divider' }}>
-        <Typography
-          variant="h6"
-          fontWeight={700}
-          sx={{
-            background: gradients.hero,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}
-        >
+        <Typography variant="h6" fontWeight={700} sx={{ color: 'primary.main' }}>
           Admin
         </Typography>
         <Typography variant="caption" color="text.secondary">
@@ -86,7 +73,7 @@ export default function AdminLayout({ themeMode, onThemeToggle }: Props) {
               borderRadius: 2,
               mb: 0.5,
               '&.Mui-selected': {
-                bgcolor: 'rgba(0,229,255,0.12)',
+                bgcolor: 'action.selected',
                 borderLeft: '3px solid',
                 borderColor: 'primary.main',
               },
@@ -101,13 +88,13 @@ export default function AdminLayout({ themeMode, onThemeToggle }: Props) {
           sx={{ borderRadius: 2, mt: 2 }}
         >
           <ListItemIcon sx={{ minWidth: 40 }}>
-            <HomeRounded />
+            <Icon name="home" size={20} />
           </ListItemIcon>
           <ListItemText primary="Back to App" />
         </ListItemButton>
         <ListItemButton onClick={handleLogout} sx={{ borderRadius: 2, mt: 0.5, color: 'error.main' }}>
           <ListItemIcon sx={{ minWidth: 40, color: 'inherit' }}>
-            <LogoutRounded />
+            <Icon name="logOut" size={20} />
           </ListItemIcon>
           <ListItemText primary="Logout" />
         </ListItemButton>
@@ -115,13 +102,41 @@ export default function AdminLayout({ themeMode, onThemeToggle }: Props) {
     </Box>
   );
 
+  const adminNavItems = ADMIN_NAV.map((item) => ({ ...item, adminOnly: undefined }));
+  const adminExtraItems = [{ label: 'Back to App', path: '/wallet', icon: <Icon name="home" size={20} /> }];
+
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex' }}>
+      {isDesktop && (
+        <NavRail
+          items={adminNavItems}
+          extraItems={adminExtraItems}
+          onNavigate={(path) => navigate(path)}
+          onLogout={handleLogout}
+          currentPath={location.pathname}
+          user={user}
+          brand="Credentix Admin"
+          brandPath="/admin"
+          isActive={isActive}
+        />
+      )}
+      {!isDesktop && (
+        <Drawer
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          PaperProps={{
+            sx: { bgcolor: 'background.paper', borderRight: 1, borderColor: 'divider' },
+          }}
+        >
+          {drawerContent}
+        </Drawer>
+      )}
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
       <AppBar
         position="sticky"
         elevation={0}
         sx={{
-          bgcolor: 'rgba(10,12,16,0.85)',
+          bgcolor: themeMode === 'dark' ? 'rgba(13,15,18,0.9)' : 'rgba(250,250,249,0.95)',
           backdropFilter: 'blur(20px)',
           borderBottom: 1,
           borderColor: 'divider',
@@ -129,68 +144,28 @@ export default function AdminLayout({ themeMode, onThemeToggle }: Props) {
         }}
       >
         <Toolbar>
-          {isMobile && (
+          {!isDesktop && (
             <IconButton edge="start" onClick={() => setDrawerOpen(true)} sx={{ mr: 1 }}>
               <MenuRounded />
             </IconButton>
           )}
-          <Typography
-            variant="h6"
-            fontWeight={800}
-            sx={{
-              cursor: 'pointer',
-              background: gradients.hero,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
-            onClick={() => navigate('/admin')}
-          >
+          <Typography variant="h6" fontWeight={800} sx={{ cursor: 'pointer', color: 'primary.main' }} onClick={() => navigate('/admin')}>
             Credentix Admin
           </Typography>
           <Box sx={{ flex: 1 }} />
-
-          {!isMobile && (
-            <Box sx={{ display: 'flex', gap: 0.5 }}>
-              {ADMIN_NAV.map((item) => (
-                <Button
-                  key={item.path}
-                  color={isActive(item.path) ? 'primary' : 'inherit'}
-                  onClick={() => navigate(item.path)}
-                  sx={{
-                    fontWeight: isActive(item.path) ? 700 : 500,
-                    borderRadius: 2,
-                  }}
-                >
-                  {item.label}
-                </Button>
-              ))}
-              <Button
-                onClick={() => navigate('/wallet')}
-                sx={{ ml: 1, borderRadius: 2 }}
-                startIcon={<HomeRounded />}
-              >
-                App
-              </Button>
-            </Box>
-          )}
-
           <ThemeToggle mode={themeMode} onToggle={onThemeToggle} />
-
-          {!isMobile && (
+          {!isDesktop && (
             <IconButton onClick={handleLogout} color="inherit" aria-label="Logout" sx={{ ml: 1 }}>
-              <LogoutRounded />
+              <Icon name="logOut" size={20} />
             </IconButton>
           )}
         </Toolbar>
       </AppBar>
 
-      <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>
-        {drawerContent}
-      </Drawer>
-
-      <Container maxWidth="xl" sx={{ py: 4 }}>
+      <Container maxWidth="xl" sx={{ py: 4, flex: 1 }}>
         <Outlet />
       </Container>
+      </Box>
     </Box>
   );
 }

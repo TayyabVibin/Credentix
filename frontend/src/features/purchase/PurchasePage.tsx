@@ -18,7 +18,6 @@ import BundleSelector from './BundleSelector';
 import { PageTransition } from '../../motion';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { initiatePurchase, clearPurchase } from '../../store/paymentsSlice';
-import { gradients } from '../../design-system/tokens';
 import coinAnim from '../../assets/animations/Turning Coin.json';
 
 const trustPoints = [
@@ -52,7 +51,7 @@ export default function PurchasePage() {
         <Box sx={{ textAlign: 'center', mb: 6 }}>
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
             <Box sx={{ maxWidth: 100, mx: 'auto', mb: 2 }}><Lottie animationData={coinAnim} loop /></Box>
-            <Typography variant="h3" sx={{ fontWeight: 800, mb: 1, background: gradients.hero, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Purchase Credits</Typography>
+            <Typography variant="h3" sx={{ fontWeight: 800, mb: 1, color: 'primary.main' }}>Purchase Credits</Typography>
             <Typography color="text.secondary" variant="h6" sx={{ fontWeight: 400, maxWidth: 480, mx: 'auto' }}>Choose the plan that fits your needs. Credits never expire and can be used across all platform features.</Typography>
           </motion.div>
         </Box>

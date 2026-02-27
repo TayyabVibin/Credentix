@@ -7,11 +7,10 @@ import TrendingUpRounded from '@mui/icons-material/TrendingUpRounded';
 import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
 import ScheduleRounded from '@mui/icons-material/ScheduleRounded';
 import CompareArrowsRounded from '@mui/icons-material/CompareArrowsRounded';
-import { PageTransition } from '../../motion';
+import { PageTransition, StaggeredReveal } from '../../motion';
 import { MetricCard, VolumeChart } from '../../visualization';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchAdminMetrics } from '../../store/adminSlice';
-import { gradients } from '../../design-system/tokens';
 
 export default function AdminDashboardPage() {
   const dispatch = useAppDispatch();
@@ -26,12 +25,14 @@ export default function AdminDashboardPage() {
   return (
     <PageTransition>
       <Box>
-        <Typography variant="h4" sx={{ mb: 3, background: gradients.hero, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Dashboard</Typography>
+        <Typography variant="h4" sx={{ mb: 3, color: 'primary.main' }}>Dashboard</Typography>
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 3, mb: 4 }}>
-          <MetricCard title="7-Day Volume" value={metrics ? formatVolume(metrics.totalVolume7d) : '—'} subtitle="CAPTURED payments" icon={<TrendingUpRounded sx={{ fontSize: 28 }} />} loading={loading} />
-          <MetricCard title="Success Rate" value={metrics ? `${metrics.successRate.toFixed(1)}%` : '—'} subtitle="Excl. PENDING" icon={<CheckCircleRounded sx={{ fontSize: 28 }} />} loading={loading} />
-          <MetricCard title="Pending" value={metrics?.pendingCount ?? '—'} subtitle="Awaiting completion" icon={<ScheduleRounded sx={{ fontSize: 28 }} />} loading={loading} />
-          <MetricCard title="Auth vs Capture" value={metrics ? `${metrics.authorizedCount} / ${metrics.capturedCount}` : '—'} subtitle="Authorized / Captured" icon={<CompareArrowsRounded sx={{ fontSize: 28 }} />} loading={loading} />
+          <StaggeredReveal staggerDelay={0.06}>
+            <MetricCard title="7-Day Volume" value={metrics?.totalVolume7d ?? 0} format={(n) => formatVolume(n)} subtitle="CAPTURED payments" icon={<TrendingUpRounded sx={{ fontSize: 28 }} />} loading={loading} />
+            <MetricCard title="Success Rate" value={metrics?.successRate ?? 0} format={(n) => `${n.toFixed(1)}%`} subtitle="Excl. PENDING" icon={<CheckCircleRounded sx={{ fontSize: 28 }} />} loading={loading} />
+            <MetricCard title="Pending" value={metrics?.pendingCount ?? 0} subtitle="Awaiting completion" icon={<ScheduleRounded sx={{ fontSize: 28 }} />} loading={loading} />
+            <MetricCard title="Auth vs Capture" value={metrics ? `${metrics.authorizedCount} / ${metrics.capturedCount}` : '—'} subtitle="Authorized / Captured" icon={<CompareArrowsRounded sx={{ fontSize: 28 }} />} loading={loading} />
+          </StaggeredReveal>
         </Box>
         {metrics && metrics.dailyVolume.length > 0 && (
           <Card>

@@ -1,10 +1,10 @@
 import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
-import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
-import StarRounded from '@mui/icons-material/StarRounded';
+import Icon from '../../design-system/primitives/Icon';
+import CommandModule from '../../design-system/primitives/CommandModule';
+import { typography } from '../../design-system/tokens';
+import { AnimatedCounter } from '../../motion';
 import { motion } from 'framer-motion';
 
 const BUNDLES = [
@@ -33,51 +33,53 @@ export default function BundleSelector({ selected, onSelect }: Props) {
             whileTap={{ scale: 0.98 }}
             style={{ display: 'flex' }}
           >
-            <Card
-              onClick={() => onSelect(bundle.id)}
+            <CommandModule
+              variant={isSelected ? 'hero' : 'default'}
+              glowOnHover
               sx={{
-                cursor: 'pointer',
                 position: 'relative',
                 flex: 1,
                 display: 'flex',
                 flexDirection: 'column',
                 border: 2,
-                borderColor: isSelected ? 'primary.main' : 'rgba(255,255,255,0.08)',
-                bgcolor: isSelected ? 'rgba(0,229,255,0.06)' : 'rgba(20,23,31,0.7)',
-                backdropFilter: 'blur(16px)',
-                transition: 'all 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+                borderColor: isSelected ? 'primary.main' : 'divider',
+                bgcolor: isSelected ? 'action.selected' : undefined,
                 overflow: 'visible',
                 '&:hover': {
-                  borderColor: isSelected ? 'primary.main' : 'rgba(0,229,255,0.3)',
-                  boxShadow: isSelected ? '0 0 40px rgba(0,229,255,0.15)' : '0 8px 32px rgba(0,0,0,0.2)',
+                  borderColor: 'primary.main',
                 },
               }}
+              onClick={() => onSelect(bundle.id)}
             >
               {bundle.popular && (
-                <Chip icon={<StarRounded sx={{ fontSize: 16 }} />} label="Recommended" color="primary" size="small" sx={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', fontWeight: 700, px: 1 }} />
+                <Chip icon={<Icon name="trendingUp" size={14} />} label="Recommended" color="primary" size="small" sx={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', fontWeight: 700, px: 1 }} />
               )}
-              <CardContent sx={{ p: 4, display: 'flex', flexDirection: 'column', flex: 1 }}>
+              <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', flex: 1 }}>
                 <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 700, letterSpacing: 1.5, mb: 0.5 }}>{bundle.label}</Typography>
                 <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5, mb: 0.5 }}>
-                  <Typography variant="h2" sx={{ fontWeight: 900, lineHeight: 1 }}>${bundle.price}</Typography>
+                  <Typography variant="h2" sx={{ ...typography.scale.monetary, fontWeight: 900, lineHeight: 1 }}>
+                    <AnimatedCounter value={bundle.price} prefix="$" />
+                  </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>one-time</Typography>
                 </Box>
-                <Typography variant="h5" sx={{ fontWeight: 700, color: 'primary.light', mb: 1 }}>{bundle.credits.toLocaleString()} credits</Typography>
+                <Typography variant="h5" sx={{ ...typography.scale.monetary, color: 'primary.light', mb: 1 }}>
+                  <AnimatedCounter value={bundle.credits} suffix=" credits" />
+                </Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>{(bundle.price / bundle.credits * 100).toFixed(1)}c per credit</Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>{bundle.tagline}</Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, flex: 1 }}>
                   {bundle.features.map((f) => (
-                    <Box key={f} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                      <CheckCircleRounded sx={{ fontSize: 18, color: 'primary.main' }} />
+                    <Box key={f} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, color: 'primary.main' }}>
+                      <Icon name="checkCircle" size={18} />
                       <Typography variant="body2" sx={{ color: 'text.secondary' }}>{f}</Typography>
                     </Box>
                   ))}
                 </Box>
-                <Box sx={{ mt: 3, py: 1.5, textAlign: 'center', borderRadius: 2, border: '1px solid', borderColor: isSelected ? 'primary.main' : 'rgba(255,255,255,0.1)', bgcolor: isSelected ? 'primary.main' : 'transparent', color: isSelected ? '#fff' : 'text.secondary', fontWeight: 600, fontSize: '0.875rem', transition: 'all 0.25s ease' }}>
+                <Box sx={{ mt: 3, py: 1.5, textAlign: 'center', borderRadius: 2, border: '1px solid', borderColor: isSelected ? 'primary.main' : 'divider', bgcolor: isSelected ? 'primary.main' : 'transparent', color: isSelected ? '#fff' : 'text.secondary', fontWeight: 600, fontSize: '0.875rem', transition: 'all 0.25s ease' }}>
                   {isSelected ? 'Selected' : 'Select Plan'}
                 </Box>
-              </CardContent>
-            </Card>
+              </Box>
+            </CommandModule>
           </motion.div>
         );
       })}

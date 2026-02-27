@@ -9,7 +9,6 @@ import TransactionList from './TransactionList';
 import { PageTransition } from '../../motion';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchTransactions } from '../../store/walletSlice';
-import { gradients } from '../../design-system/tokens';
 
 export default function TransactionsPage() {
   const dispatch = useAppDispatch();
@@ -27,7 +26,7 @@ export default function TransactionsPage() {
     <PageTransition>
       <Box>
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" sx={{ fontWeight: 800, background: gradients.hero, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', mb: 0.5 }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: 'primary.main', mb: 0.5 }}>
             Transaction History
           </Typography>
           <Typography variant="body2" color="text.secondary">Complete record of all credit transactions in your account</Typography>

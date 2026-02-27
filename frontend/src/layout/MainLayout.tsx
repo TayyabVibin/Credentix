@@ -3,7 +3,6 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -16,23 +15,18 @@ import Avatar from '@mui/material/Avatar';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import MenuRounded from '@mui/icons-material/MenuRounded';
-import AccountBalanceWalletRounded from '@mui/icons-material/AccountBalanceWalletRounded';
-import ShoppingCartRounded from '@mui/icons-material/ShoppingCartRounded';
-import ReceiptLongRounded from '@mui/icons-material/ReceiptLongRounded';
-import PersonRounded from '@mui/icons-material/PersonRounded';
-import LogoutRounded from '@mui/icons-material/LogoutRounded';
-import AdminPanelSettingsRounded from '@mui/icons-material/AdminPanelSettingsRounded';
+import Icon from '../design-system/primitives/Icon';
+import NavRail from './NavRail';
 import ThemeToggle from './ThemeToggle';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { logout } from '../store/authSlice';
-import { gradients } from '../design-system/tokens';
 
 const NAV_ITEMS = [
-  { label: 'Wallet', path: '/wallet', icon: <AccountBalanceWalletRounded /> },
-  { label: 'Purchase', path: '/purchase', icon: <ShoppingCartRounded /> },
-  { label: 'Transactions', path: '/transactions', icon: <ReceiptLongRounded /> },
-  { label: 'Profile', path: '/profile', icon: <PersonRounded /> },
-  { label: 'Admin', path: '/admin', icon: <AdminPanelSettingsRounded />, adminOnly: true },
+  { label: 'Wallet', path: '/wallet', icon: <Icon name="wallet" size={20} /> },
+  { label: 'Purchase', path: '/purchase', icon: <Icon name="shoppingCart" size={20} /> },
+  { label: 'Transactions', path: '/transactions', icon: <Icon name="receipt" size={20} /> },
+  { label: 'Profile', path: '/profile', icon: <Icon name="user" size={20} /> },
+  { label: 'Admin', path: '/admin', icon: <Icon name="dashboard" size={20} />, adminOnly: true },
 ];
 
 interface Props {
@@ -47,7 +41,7 @@ export default function MainLayout({ themeMode, onThemeToggle }: Props) {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((s) => s.auth);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
 
   const handleLogout = () => {
     dispatch(logout());
@@ -56,20 +50,12 @@ export default function MainLayout({ themeMode, onThemeToggle }: Props) {
 
   const filteredItems = NAV_ITEMS.filter(
     (item) => !('adminOnly' in item && item.adminOnly) || user?.role === 'ADMIN',
-  );
+  ).map(({ adminOnly: _, ...item }) => item);
 
   const drawerContent = (
-    <Box sx={{ width: 270, pt: 2 }}>
-      <Box sx={{ px: 3, pb: 2, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <Typography
-          variant="h6"
-          fontWeight={800}
-          sx={{
-            background: gradients.hero,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}
-        >
+    <Box sx={{ width: 270, pt: 2, height: '100%', bgcolor: 'background.paper' }}>
+      <Box sx={{ px: 3, pb: 2, borderBottom: 1, borderColor: 'divider' }}>
+        <Typography variant="h6" fontWeight={800} sx={{ color: 'primary.main' }}>
           Credentix
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 2 }}>
@@ -104,10 +90,10 @@ export default function MainLayout({ themeMode, onThemeToggle }: Props) {
               borderRadius: 2,
               mb: 0.5,
               '&.Mui-selected': {
-                bgcolor: 'rgba(0,229,255,0.12)',
+                bgcolor: 'action.selected',
                 borderLeft: '3px solid',
                 borderColor: 'primary.main',
-                '&:hover': { bgcolor: 'rgba(0,229,255,0.18)' },
+                '&:hover': { bgcolor: 'action.hover' },
               },
             }}
           >
@@ -128,7 +114,7 @@ export default function MainLayout({ themeMode, onThemeToggle }: Props) {
           sx={{ borderRadius: 2, mt: 2, color: 'error.main' }}
         >
           <ListItemIcon sx={{ minWidth: 40, color: 'inherit' }}>
-            <LogoutRounded />
+            <Icon name="logOut" size={20} />
           </ListItemIcon>
           <ListItemText primary="Logout" />
         </ListItemButton>
@@ -137,101 +123,73 @@ export default function MainLayout({ themeMode, onThemeToggle }: Props) {
   );
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      <AppBar
-        position="sticky"
-        elevation={0}
-        sx={{
-          bgcolor: themeMode === 'dark' ? 'rgba(10,12,16,0.85)' : 'rgba(248,250,252,0.9)',
-          backdropFilter: 'blur(20px)',
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          color: 'text.primary',
-        }}
-      >
-        <Toolbar>
-          {isMobile && (
-            <IconButton edge="start" onClick={() => setDrawerOpen(true)} sx={{ mr: 1 }}>
-              <MenuRounded />
-            </IconButton>
-          )}
-          <Typography
-            variant="h6"
-            fontWeight={800}
-            sx={{
-              cursor: 'pointer',
-              background: gradients.hero,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
-            onClick={() => navigate('/wallet')}
-          >
-            Credentix
-          </Typography>
-          <Box sx={{ flex: 1 }} />
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex' }}>
+      {/* Desktop: NavRail */}
+      {isDesktop && (
+        <NavRail
+          items={filteredItems}
+          onNavigate={(path) => navigate(path)}
+          onLogout={handleLogout}
+          currentPath={location.pathname}
+          user={user}
+          brand="Credentix"
+        />
+      )}
 
-          {!isMobile && (
-            <Box sx={{ display: 'flex', gap: 0.5, mr: 1 }}>
-              {filteredItems.map((item) => {
-                const isActive = location.pathname === item.path;
-                return (
-                  <Button
-                    key={item.path}
-                    onClick={() => navigate(item.path)}
-                    sx={{
-                      fontWeight: isActive ? 700 : 500,
-                      color: isActive ? 'primary.main' : 'text.secondary',
-                      borderRadius: 2,
-                      position: 'relative',
-                      '&::after': isActive
-                        ? {
-                            content: '""',
-                            position: 'absolute',
-                            bottom: 4,
-                            left: '25%',
-                            width: '50%',
-                            height: 2,
-                            borderRadius: 1,
-                            background: gradients.hero,
-                          }
-                        : {},
-                      '&:hover': {
-                        bgcolor: themeMode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
-                      },
-                    }}
-                  >
-                    {item.label}
-                  </Button>
-                );
-              })}
-            </Box>
-          )}
+      {/* Mobile/Tablet: Drawer */}
+      {!isDesktop && (
+        <Drawer
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          PaperProps={{
+            sx: { bgcolor: 'background.paper', borderRight: 1, borderColor: 'divider' },
+          }}
+        >
+          {drawerContent}
+        </Drawer>
+      )}
 
-          <ThemeToggle mode={themeMode} onToggle={onThemeToggle} />
+      {/* Main content area */}
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+        <AppBar
+          position="sticky"
+          elevation={0}
+          sx={{
+            bgcolor: themeMode === 'dark' ? 'rgba(13,15,18,0.9)' : 'rgba(250,250,249,0.95)',
+            backdropFilter: 'blur(20px)',
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            color: 'text.primary',
+          }}
+        >
+          <Toolbar>
+            {!isDesktop && (
+              <IconButton edge="start" onClick={() => setDrawerOpen(true)} sx={{ mr: 1 }}>
+                <MenuRounded />
+              </IconButton>
+            )}
+            <Typography variant="h6" fontWeight={800} sx={{ cursor: 'pointer', color: 'primary.main' }} onClick={() => navigate('/wallet')}>
+              Credentix
+            </Typography>
+            <Box sx={{ flex: 1 }} />
+            <ThemeToggle mode={themeMode} onToggle={onThemeToggle} />
+            {isDesktop && (
+              <IconButton onClick={() => navigate('/profile')} sx={{ ml: 1 }}>
+                <Avatar
+                  src={user?.avatarUrl ?? undefined}
+                  sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: 14 }}
+                >
+                  {user?.fullName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
+                </Avatar>
+              </IconButton>
+            )}
+          </Toolbar>
+        </AppBar>
 
-          {!isMobile && (
-            <IconButton
-              onClick={() => navigate('/profile')}
-              sx={{ ml: 1 }}
-            >
-              <Avatar
-                src={user?.avatarUrl ?? undefined}
-                sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: 14 }}
-              >
-                {user?.fullName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
-              </Avatar>
-            </IconButton>
-          )}
-        </Toolbar>
-      </AppBar>
-
-      <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>
-        {drawerContent}
-      </Drawer>
-
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Outlet />
-      </Container>
+        <Container maxWidth="lg" sx={{ py: 4, flex: 1 }}>
+          <Outlet />
+        </Container>
+      </Box>
     </Box>
   );
 }

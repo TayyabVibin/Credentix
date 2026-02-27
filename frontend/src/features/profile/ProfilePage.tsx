@@ -29,7 +29,6 @@ import { useSnackbar } from 'notistack';
 import { PageTransition } from '../../motion';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout, fetchProfile, updateProfile } from '../../store/authSlice';
-import { gradients } from '../../design-system/tokens';
 
 const ROLES = ['Developer', 'Designer', 'Product Manager', 'Engineering Manager', 'CTO / VP Engineering', 'Founder / CEO', 'Student', 'Other'];
 const BUSINESS_TYPES = ['SaaS', 'E-commerce', 'Fintech', 'Healthcare', 'Education', 'Media', 'Consulting', 'Other'];
@@ -116,7 +115,7 @@ export default function ProfilePage() {
     <PageTransition>
       <Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-          <Typography variant="h4" sx={{ fontWeight: 800, background: gradients.hero, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Profile</Typography>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: 'primary.main' }}>Profile</Typography>
           {!editing ? (
             <Button variant="outlined" startIcon={<EditRounded />} onClick={() => setEditing(true)} sx={{ borderColor: 'rgba(255,255,255,0.15)', color: 'text.secondary' }}>Edit Profile</Button>
           ) : (

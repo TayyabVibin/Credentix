@@ -1,27 +1,21 @@
+@import '@fontsource/geist/400.css';
+@import '@fontsource/geist/500.css';
+@import '@fontsource/geist/600.css';
+@import '@fontsource/geist/700.css';
+@import '@fontsource/geist/800.css';
+
 :root {
-  /* Surfaces */
-  --color-surface-obsidian: #0A0C10;
-  --color-surface-graphite: #14171F;
-  --color-surface-slate: #1C2028;
-  --color-surface-border: rgba(255, 255, 255, 0.06);
-  --color-surface-border-hover: rgba(255, 255, 255, 0.1);
-
-  /* Accents */
-  --color-accent-cyan: #00E5FF;
-  --color-accent-violet: #8B5CF6;
-  --color-accent-emerald: #10B981;
-  --color-accent-red: #F87171;
-  --color-accent-indigo: #6366F1;
-
-  /* Data states */
-  --color-profit: #00E5FF;
-  --color-loss: #F87171;
-  --color-neutral: #64748B;
+  /* Fintech palette - emerald + amber */
+  --color-primary: #059669;
+  --color-primary-light: #10B981;
+  --color-secondary: #D97706;
+  --color-profit: #059669;
+  --color-loss: #DC2626;
+  --color-neutral: #78716C;
 
   /* Gradients */
-  --gradient-hero: linear-gradient(135deg, #00E5FF 0%, #8B5CF6 50%, #6366F1 100%);
-  --gradient-profit: linear-gradient(135deg, #00E5FF, #10B981);
-  --gradient-loss: linear-gradient(135deg, #F87171, #EF4444);
+  --gradient-primary: linear-gradient(135deg, #059669 0%, #047857 100%);
+  --gradient-hero: linear-gradient(135deg, #059669 0%, #0D9488 100%);
 
   /* Motion */
   --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
@@ -31,7 +25,7 @@
   --duration-page: 400ms;
 
   /* Focus ring */
-  --focus-ring: 0 0 0 2px rgba(0, 229, 255, 0.4);
+  --focus-ring: 0 0 0 2px rgba(5, 150, 105, 0.4);
 }
 
 *,
@@ -57,12 +51,12 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent-cyan);
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
 ::selection {
-  background: var(--color-accent-violet);
+  background: var(--color-primary);
   color: white;
 }
 
@@ -70,4 +64,68 @@ body {
 .font-tabular {
   font-variant-numeric: tabular-nums;
   font-family: 'JetBrains Mono', 'SF Mono', monospace;
+}
+
+/* Ambient background and depth */
+.app-background-dark {
+  position: relative;
+  background-color: #0D0F12;
+}
+.app-background-dark::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.5;
+}
+@keyframes ambientPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+.app-background-dark::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 50%;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(ellipse at 100% 0%, rgba(5,150,105,0.08) 0%, transparent 50%);
+  animation: ambientPulse 45s ease-in-out infinite;
+}
+
+.app-background-light {
+  position: relative;
+  background-color: #FAFAF9;
+}
+.app-background-light::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.6;
+}
+.app-background-light::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 50%;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(ellipse at 100% 0%, rgba(4,120,87,0.04) 0%, transparent 50%);
+  animation: ambientPulse 45s ease-in-out infinite;
 }

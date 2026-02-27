@@ -6,7 +6,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { lightTheme, darkTheme } from './design-system/theme';
-import { MainLayout, AdminLayout, ProtectedRoute, AdminRoute } from './layout';
+import { MainLayout, AdminLayout, ProtectedRoute, AdminRoute, SnackbarProvider } from './layout';
 import { useAppDispatch, useAppSelector } from './store/hooks';
 import { fetchProfile } from './store/authSlice';
 import { API_ERROR_EVENT } from './utils/apiErrorEvent';
@@ -66,9 +66,15 @@ export default function App() {
     return () => window.removeEventListener(API_ERROR_EVENT, handler as EventListener);
   }, [enqueueSnackbar]);
 
+  useEffect(() => {
+    document.body.classList.remove('app-background-dark', 'app-background-light');
+    document.body.classList.add(mode === 'dark' ? 'app-background-dark' : 'app-background-light');
+  }, [mode]);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <SnackbarProvider>
       <BrowserRouter>
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
@@ -100,6 +106,7 @@ export default function App() {
           </Routes>
         </Suspense>
       </BrowserRouter>
+      </SnackbarProvider>
     </ThemeProvider>
   );
 }

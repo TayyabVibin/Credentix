@@ -1,15 +1,10 @@
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import CommandModule from '../../design-system/primitives/CommandModule';
+import DataGrid from '../../design-system/primitives/DataGrid';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import Skeleton from '@mui/material/Skeleton';
-import AddCircleRounded from '@mui/icons-material/AddCircleRounded';
-import { motion } from 'framer-motion';
+import Icon from '../../design-system/primitives/Icon';
+import { typography } from '../../design-system/tokens';
+import { SkeletonShimmer } from '../../motion';
 
 interface Entry {
   id: string;
@@ -23,62 +18,64 @@ interface Props {
   entries: Entry[];
   loading?: boolean;
   compact?: boolean;
+  /** When true, render table only (no CommandModule wrapper). Use when parent provides the card. */
+  noCard?: boolean;
 }
 
-export default function TransactionList({ entries, loading, compact }: Props) {
-  if (loading) {
-    return (
-      <Box>
-        {Array.from({ length: compact ? 3 : 5 }).map((_, i) => (
-          <Skeleton key={i} variant="rectangular" height={48} sx={{ mb: 1, borderRadius: 1 }} />
-        ))}
+const COLUMNS = [
+  {
+    id: 'credits',
+    label: 'Credits',
+    render: (row: Entry) => (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, color: 'success.main' }}>
+        <Icon name="plusCircle" size={20} />
+        <Typography variant="body1" fontWeight={600} sx={{ ...typography.scale.monetary, fontSize: '1rem' }}>+{row.credits}</Typography>
       </Box>
-    );
-  }
-  if (entries.length === 0) {
-    return (
-      <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
-        <Typography>No transactions yet. Purchase credits to get started!</Typography>
-      </Box>
-    );
-  }
+    ),
+  },
+  {
+    id: 'balanceAfter',
+    label: 'Balance After',
+    align: 'right' as const,
+    render: (row: Entry) => <Typography variant="body1" fontWeight={600} sx={{ ...typography.scale.monetary, fontSize: '1rem' }}>{row.balanceAfter.toLocaleString()}</Typography>,
+  },
+  {
+    id: 'createdAt',
+    label: 'Date',
+    align: 'right' as const,
+    render: (row: Entry) => (
+      <Typography variant="body1" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
+        {new Date(row.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+      </Typography>
+    ),
+  },
+];
+
+export default function TransactionList({ entries, loading, compact, noCard }: Props) {
+  const tableContent = loading ? (
+    <Box>
+      {Array.from({ length: compact ? 3 : 5 }).map((_, i) => (
+        <SkeletonShimmer key={i} variant="rectangular" width="100%" height={56} sx={{ mb: 1.5, borderRadius: 1 }} />
+      ))}
+    </Box>
+  ) : entries.length === 0 ? (
+    <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
+      <Typography>No transactions yet. Purchase credits to get started!</Typography>
+    </Box>
+  ) : (
+    <DataGrid
+      columns={COLUMNS}
+      rows={entries}
+      getRowId={(r) => r.id}
+      size="medium"
+    />
+  );
+
+  if (noCard) return tableContent;
+
   return (
-    <TableContainer component={Paper} elevation={0} sx={{ border: 1, borderColor: 'divider' }}>
-      <Table size={compact ? 'small' : 'medium'}>
-        <TableHead>
-          <TableRow>
-            <TableCell>Credits</TableCell>
-            <TableCell align="right">Balance After</TableCell>
-            <TableCell align="right">Date</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {entries.map((entry, i) => (
-            <motion.tr
-              key={entry.id}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.05 }}
-              style={{ display: 'table-row' }}
-            >
-              <TableCell>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <AddCircleRounded color="success" fontSize="small" />
-                  <Typography fontWeight={600} color="success.main">+{entry.credits}</Typography>
-                </Box>
-              </TableCell>
-              <TableCell align="right">
-                <Typography fontWeight={500}>{entry.balanceAfter.toLocaleString()}</Typography>
-              </TableCell>
-              <TableCell align="right">
-                <Typography variant="body2" color="text.secondary">
-                  {new Date(entry.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                </Typography>
-              </TableCell>
-            </motion.tr>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <CommandModule glowOnHover={false} sx={{ overflow: 'hidden', p: 0 }}>
+      {tableContent}
+    </CommandModule>
   );
 }

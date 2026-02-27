@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import Skeleton from '@mui/material/Skeleton';
 import Box from '@mui/material/Box';
+import { useTheme } from '@mui/material/styles';
 
 interface Props {
   variant?: 'text' | 'rectangular' | 'circular';
@@ -15,6 +16,11 @@ export default function SkeletonShimmer({
   height,
   sx = {},
 }: Props) {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+  const shimmerColor = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(5,150,105,0.15)';
+  const baseColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+
   return (
     <Box
       sx={{
@@ -28,15 +34,13 @@ export default function SkeletonShimmer({
         variant={variant}
         width={width}
         height={height}
-        sx={{
-          bgcolor: 'rgba(255,255,255,0.06)',
-        }}
+        sx={{ bgcolor: baseColor }}
       />
       <motion.div
         style={{
           position: 'absolute',
           inset: 0,
-          background: `linear-gradient(90deg, transparent 0%, rgba(0,229,255,0.1) 50%, transparent 100%)`,
+          background: `linear-gradient(90deg, transparent 0%, ${shimmerColor} 50%, transparent 100%)`,
           width: '60%',
           pointerEvents: 'none',
         }}
