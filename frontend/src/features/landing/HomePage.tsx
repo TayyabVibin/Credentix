@@ -175,7 +175,7 @@ export default function HomePage() {
           <Grid container spacing={6} alignItems="center">
             <Grid size={{ xs: 12, md: 6 }}>
               <motion.div initial={{ opacity: 0, x: -40 }} animate={heroInView ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.7 }}>
-                <Typography variant="display" sx={{ fontSize: { xs: '2.5rem', md: '3.5rem' }, lineHeight: 1.1, mb: 3, background: gradients.hero, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                <Typography variant="h1" sx={{ fontSize: { xs: '2.5rem', md: '3.5rem' }, lineHeight: 1.1, mb: 3, letterSpacing: '-0.04em', background: gradients.hero, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                   Next-Generation Credit Payment Infrastructure
                 </Typography>
                 <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 400, lineHeight: 1.7, mb: 4, maxWidth: 520 }}>

@@ -97,13 +97,6 @@ export const darkTheme = createTheme({
       fontSize: typography.scale.h6.fontSize,
       lineHeight: typography.scale.h6.lineHeight,
     },
-    display: {
-      fontFamily: typography.fontFamily.heading,
-      fontWeight: 800,
-      fontSize: 56,
-      lineHeight: 1.1,
-      letterSpacing: '-0.04em',
-    },
     button: { textTransform: 'none' as const, fontWeight: 600 },
     body1: { lineHeight: 1.6, fontSize: 16 },
     body2: { lineHeight: 1.6, fontSize: 14 },
@@ -280,14 +273,6 @@ export const lightTheme = createTheme({
     h6: {
       fontFamily: typography.fontFamily.heading,
       fontWeight: 600,
-      color: light.text.primary,
-    },
-    display: {
-      fontFamily: typography.fontFamily.heading,
-      fontWeight: 800,
-      fontSize: 56,
-      lineHeight: 1.1,
-      letterSpacing: '-0.04em',
       color: light.text.primary,
     },
     button: { textTransform: 'none' as const, fontWeight: 600 },
