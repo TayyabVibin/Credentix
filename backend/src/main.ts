@@ -5,20 +5,24 @@ import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 
-const REQUIRED_ENV_VARS = [
+const DB_VARS = [
   'DB_HOST',
   'POSTGRES_USER',
   'POSTGRES_PASSWORD',
   'POSTGRES_DB',
-  'JWT_SECRET',
 ];
 
 function validateEnv(): void {
   const logger = new Logger('Bootstrap');
-  const missing = REQUIRED_ENV_VARS.filter((key) => !process.env[key]);
-  if (missing.length > 0) {
+  if (!process.env.JWT_SECRET) {
+    logger.error('Missing required environment variable: JWT_SECRET');
+    process.exit(1);
+  }
+  const hasDbUrl = !!process.env.DATABASE_URL;
+  const hasDbVars = DB_VARS.every((key) => process.env[key]);
+  if (!hasDbUrl && !hasDbVars) {
     logger.error(
-      `Missing required environment variables: ${missing.join(', ')}`,
+      `Missing database config: set DATABASE_URL or (${DB_VARS.join(', ')})`,
     );
     process.exit(1);
   }

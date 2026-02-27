@@ -89,8 +89,14 @@ export class WebhookProcessor {
   private async processNotification(
     notification: AdyenNotificationItem['NotificationRequestItem'],
   ): Promise<void> {
-    const { pspReference, originalReference, eventCode, success, merchantReference, reason } =
-      notification;
+    const {
+      pspReference,
+      originalReference,
+      eventCode,
+      success,
+      merchantReference,
+      reason,
+    } = notification;
     const isSuccess = success === 'true';
 
     const idempotencyHash = this.computeHash(pspReference, eventCode, success);
@@ -117,7 +123,8 @@ export class WebhookProcessor {
       let payment = await this.paymentService.findByPspReference(pspReference);
 
       if (!payment && originalReference) {
-        payment = await this.paymentService.findByPspReference(originalReference);
+        payment =
+          await this.paymentService.findByPspReference(originalReference);
       }
       if (!payment) {
         payment =
@@ -191,10 +198,7 @@ export class WebhookProcessor {
 
     if (!isSuccess) return mapping.failure ?? null;
 
-    if (
-      eventCode === 'AUTHORISATION' &&
-      this.captureDelayHours === 0
-    ) {
+    if (eventCode === 'AUTHORISATION' && this.captureDelayHours === 0) {
       return PaymentStatus.CAPTURED;
     }
 

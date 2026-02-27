@@ -26,17 +26,27 @@ import { LedgerEntry } from './modules/wallet/entities/ledger-entry.entity';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres' as const,
-        host: config.getOrThrow<string>('DB_HOST'),
-        port: parseInt(config.get('POSTGRES_PORT', '5432'), 10),
-        username: config.getOrThrow<string>('POSTGRES_USER'),
-        password: config.getOrThrow<string>('POSTGRES_PASSWORD'),
-        database: config.getOrThrow<string>('POSTGRES_DB'),
-        entities: [User, Payment, PaymentEvent, WebhookLog, LedgerEntry],
-        synchronize: config.get('NODE_ENV') !== 'production',
-        logging: config.get('NODE_ENV') === 'development',
-      }),
+      useFactory: (config: ConfigService) => {
+        const databaseUrl = config.get<string>('DATABASE_URL');
+        const baseConfig = {
+          type: 'postgres' as const,
+          entities: [User, Payment, PaymentEvent, WebhookLog, LedgerEntry],
+          synchronize: config.get('NODE_ENV') !== 'production',
+          logging: config.get('NODE_ENV') === 'development',
+          ssl: true,
+        };
+        if (databaseUrl) {
+          return { ...baseConfig, url: databaseUrl };
+        }
+        return {
+          ...baseConfig,
+          host: config.getOrThrow<string>('DB_HOST'),
+          port: parseInt(config.get('POSTGRES_PORT', '5432'), 10),
+          username: config.getOrThrow<string>('POSTGRES_USER'),
+          password: config.getOrThrow<string>('POSTGRES_PASSWORD'),
+          database: config.getOrThrow<string>('POSTGRES_DB'),
+        };
+      },
     }),
     UserModule,
     PaymentModule,
