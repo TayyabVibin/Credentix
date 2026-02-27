@@ -175,7 +175,7 @@ Browse all payments with status, amount, and links to detail views. Filter by st
 
 and the below image is the detail view of a payment:
 
-![](./public/images/Admin-Payment-Details.png)
+![](./public/images/Admin-Payments-Details.png)
 > *[Admin payment detail — Payment detail view]*
 
 ---
